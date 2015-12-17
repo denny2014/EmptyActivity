@@ -1,0 +1,152 @@
+package com.zet.activity;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.text.Html;
+import android.text.TextUtils;
+import android.webkit.WebSettings;
+import android.webkit.WebSettings.LayoutAlgorithm;
+import android.webkit.WebView;
+import android.widget.TextView;
+
+import com.bdkj.bdlibrary.utils.StorageUtils;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.utils.LogUtils;
+import com.zet.BaseActivity;
+import com.zet.Constants;
+import com.zet.R;
+import com.zet.model.ReciveOneMailDB;
+
+@ContentView(R.layout.activity_email_detail)
+public class EmailDetailActivity extends BaseActivity {
+	/*
+	 * Html.fromHtml("<font color='#333333'>" + "纳税人名称</font>")
+	 */
+	@ViewInject(R.id.tv_title)
+	private TextView tv_title;// 标题
+	@ViewInject(R.id.sjx_yj_fjr)
+	private TextView sjx_yj_fjr;// 发件人
+	@ViewInject(R.id.sjx_yj_sjr)
+	private TextView sjx_yj_sjr;// 收件人
+	@ViewInject(R.id.sjx_yj_cs)
+	private TextView sjx_yj_cs;// 抄送
+	@ViewInject(R.id.sjx_yj_fssj)
+	private TextView sjx_yj_fssj;// 发送时间
+	@ViewInject(R.id.email_text_view_content)
+	private WebView email_text_view_content;// 内容
+	@ViewInject(R.id.email_text_textview_content)
+	private TextView email_text_textview_content;
+
+	private ReciveOneMailDB mReciveOneMailDB;
+
+	@SuppressLint("SetJavaScriptEnabled")
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		mReciveOneMailDB = (ReciveOneMailDB) (savedInstanceState != null ? savedInstanceState
+				.getSerializable("mReciveOneMail") : getIntent()
+				.getSerializableExtra("mReciveOneMail"));
+		if (mReciveOneMailDB == null) {
+			finish();
+		}
+		String mSubject = TextUtils.isEmpty(mReciveOneMailDB.getSubject()) ? ""
+				: mReciveOneMailDB.getSubject();
+		String mFrom = TextUtils.isEmpty(mReciveOneMailDB.getForm()) ? ""
+				: mReciveOneMailDB.getForm();
+		String mTo = TextUtils.isEmpty(mReciveOneMailDB.getTopeople()) ? ""
+				: mReciveOneMailDB.getTopeople();
+		String mCC = TextUtils.isEmpty(mReciveOneMailDB.getCcpeople()) ? ""
+				: mReciveOneMailDB.getCcpeople();
+		String mTime = TextUtils.isEmpty(mReciveOneMailDB.getSentDate()) ? ""
+				: mReciveOneMailDB.getSentDate();
+		String mContent = TextUtils.isEmpty(mReciveOneMailDB.getBodycontent()) ? ""
+				: mReciveOneMailDB.getBodycontent();
+		tv_title.setText(mSubject);
+		sjx_yj_fjr.setText(mFrom);
+		sjx_yj_sjr.setText(mTo);
+		sjx_yj_cs.setText(mCC);
+		sjx_yj_fssj.setText(mTime);
+		// email_text_view_content.setText(Html.fromHtml(mContent));
+		WebSettings webSettings = email_text_view_content.getSettings();
+		webSettings.setUseWideViewPort(true);// 设置此属性，可任意比例缩放
+		webSettings.setLoadWithOverviewMode(true);
+		webSettings.setJavaScriptEnabled(true); // 支持js
+		webSettings.setSupportZoom(true); // 支持缩放
+		webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN); // 支持内容重新布局
+		webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); // 关闭webview中缓存
+		webSettings.setAllowFileAccess(true); // 设置可以访问文件
+		webSettings.setNeedInitialFocus(true); // 当webview调用requestFocus时为webview设置节点
+		webSettings.setJavaScriptCanOpenWindowsAutomatically(true); // 支持通过JS打开新窗口
+		webSettings.setLoadsImagesAutomatically(true); // 支持自动加载图片
+		LogUtils.d(mContent);
+		email_text_view_content.getSettings().setDefaultTextEncodingName("gbk");
+		email_text_view_content.loadData(mContent, "text/html", "gbk");
+		email_text_textview_content.setText(Html.fromHtml(mContent));
+
+		// try {
+		// File file = new File(path, AppfileName);
+		// FileInputStream is = new FileInputStream(file);
+		// // OutputStreamWriter out =new OutputStreamWriter(is,"utf-8");
+		// byte[] b = new byte[is.available()];
+		// is.read(b);
+		// InputStreamReader reader = new InputStreamReader(is, "utf-8");
+		// reader.read();
+		// String result = new String(b);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				String path = StorageUtils.getStorageFile().toString()
+						+ Constants.ROOT_DIRECTION + "/tmp";
+				String AppfileName = "4d10319b-729b-4c70-9a7f-57a38ac7eacf64085xml";//mReciveOneMailDB.getAppfileName();
+				String result = readFile(path + "/" + AppfileName);
+				mHandler.sendMessage(mHandler.obtainMessage(0, result));
+			}
+		}).start();
+	}
+Handler mHandler = new Handler(){
+	public void handleMessage(android.os.Message msg) {
+		LogUtils.d("读取成功：" + msg.obj.toString());
+	};
+};
+	/**
+	 * 02. * 读取文件内容 03. * 04. * @param filePathAndName 05. * String 如 c:\\1.txt
+	 * 绝对路径 06. * @return boolean 07.
+	 */
+	public static String readFile(String filePathAndName) {
+		String fileContent = "";
+		try {
+			File f = new File(filePathAndName);
+
+			if (f.isFile() && f.exists()) {
+				BufferedReader reader = new BufferedReader(new FileReader(f));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					fileContent += line;
+				}
+				reader.close();
+			}
+		} catch (Exception e) {
+			System.out.println("读取文件内容操作出错");
+			e.printStackTrace();
+		}
+		return fileContent;
+	}
+
+}

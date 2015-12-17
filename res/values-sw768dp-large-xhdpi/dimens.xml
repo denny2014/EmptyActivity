@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- 适配E人E本 -->
+
+  <!--字体定义-->
+  <dimen name="text_micro">18sp</dimen>
+  <dimen name="text_small">20sp</dimen>
+  <dimen name="text_mediumn_small">22sp</dimen>
+  <dimen name="text_mediumn">24sp</dimen>
+  <dimen name="text_big">26sp</dimen>
+  <dimen name="text_large">28sp</dimen>
+
+  <!--action_top-->
+  <dimen name="activity_search_top_padding">15dp</dimen>
+  <dimen name="activity_search_top_padding_top">20dp</dimen>
+
+  <!--类型(选择菜单)页面-->
+  <dimen name="activity_type_margin_top">50dp</dimen>
+
+  <!--搜索-->
+  <dimen name="activity_search_input_padding_top">8dp</dimen>
+  <dimen name="activity_search_item_padding_left">20dp</dimen>
+  <dimen name="activity_search_item_padding_top">28dp</dimen>
+  <dimen name="activity_search_help_width">40dp</dimen>
+  <dimen name="activity_search_collect_width">100dp</dimen>
+
+  <!--登录-->
+  <dimen name="activity_login_padding">35dp</dimen>
+  <dimen name="activity_login_text_padding">14dp</dimen>
+
+  <!--选择菜单-->
+  <dimen name="activity_type_item_height">180dp</dimen>
+</resources>

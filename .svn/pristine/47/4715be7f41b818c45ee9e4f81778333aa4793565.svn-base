@@ -1,0 +1,72 @@
+package com.zet.adapter;
+
+import java.util.List;
+
+import android.R.id;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.zet.R;
+import com.zet.parser.DETAIL;
+
+public class EmailDetailAdapter extends BaseAdapter {
+	private List<DETAIL> lists;
+	private Context context;
+	private LayoutInflater mLayoutInflater;
+
+	public EmailDetailAdapter(Context mContext, List<DETAIL> lists) {
+		this.lists = lists;
+		this.context = mContext;
+		mLayoutInflater = LayoutInflater.from(mContext);
+	}
+
+	public void changeData(List<DETAIL> lists) {
+		this.lists = lists;
+	}
+
+	@Override
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return lists.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		// TODO Auto-generated method stub
+		return lists.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		// TODO Auto-generated method stub
+		return lists.get(position).hashCode();
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		// TODO Auto-generated method stub
+		if (convertView == null) {
+			convertView = mLayoutInflater.inflate(R.layout.email_detail_item,
+					null);
+		}
+		DETAIL mDetail = lists.get(position);
+		TextView mTextView1 = (TextView) convertView
+				.findViewById(R.id.exp_email_detail_1);
+		TextView mTextView2 = (TextView) convertView
+				.findViewById(R.id.exp_email_detail_2);
+		TextView mTextView3 = (TextView) convertView
+				.findViewById(R.id.exp_email_detail_3);
+		TextView mTextView4 = (TextView) convertView
+				.findViewById(R.id.exp_email_detail_4);
+		mTextView1.setText("名称 ：" + mDetail.getELEMENT_NAME());
+		mTextView2.setText("日期 ：" + mDetail.getSET_YEAR());
+		mTextView3.setText("PROC_CONTENT ：" + mDetail.getPROC_CONTENT());
+		mTextView4.setText("ELEMENT_CODE ：" + mDetail.getELEMENT_CODE());
+		return convertView;
+	}
+
+}

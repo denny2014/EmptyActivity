@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">政e通</string>
+    <string name="dialog_loading">正在加载中…</string>
+    <string name="dialog_email_loading">正在验证邮箱信息…</string>
+    <string name="dialog_sure">确定</string>
+    <string name="dialog_loading_fail">网络加载失败，请检查网络!</string>
+    <string name="dialog_recognition_devide">正在识别设备号...</string>
+    <string name="version">v%1$s</string>
+    <string name="default_compnay_des">本产品仅限持有者工作所用\n南京正财软件有限公司拥有版权</string>
+
+    <!-- 刷新 -->
+    <string name="pull_to_refresh">下拉刷新</string>
+    <string name="release_to_refresh">释放立即刷新</string>
+    <string name="refreshing">正在刷新...</string>
+    <string name="refresh_succeed">刷新成功</string>
+    <string name="refresh_fail">刷新失败</string>
+    <string name="pullup_to_load">上拉加载更多</string>
+    <string name="release_to_load">释放立即加载</string>
+    <string name="loading">正在加载...</string>
+    <string name="load_succeed">加载成功</string>
+    <string name="load_fail">加载失败</string>
+
+    <!-- 登录 -->
+    <string name="activity_login_username">用户名:</string>
+    <string name="activity_login_password">密&#160;&#160;&#160;&#160;码:</string>
+    <string name="activity_login_server_ip">服务器:</string>
+    <string name="activity_login_server_ip_hint">请输入服务器地址</string>
+    <string name="activity_login_remember_password">记住账号密码</string>
+    <string name="activity_login_submit">登&#160;&#160;&#160;&#160;&#160;&#160;录</string>
+    <string name="activity_login_modify_pass">修改密码</string>
+    <string name="activity_login_username_hint">登录账户</string>
+    <string name="activity_login_pass_hint">登录密码</string>
+    <string name="activity_login_username_disallow_null">用户名不能为空</string>
+    <string name="activity_login_pass_disallow_null">密码不能为空</string>
+    <string name="activity_login_success">登录成功</string>
+    <string name="activity_login_setting_success">设置成功</string>
+    <string name="activity_login_setting_server_disallow_null">服务器地址不能为空</string>
+    <string name="activity_login_setting_error">服务器地址无效，请重新输入</string>
+    <string name="activity_login_setting_tip">请输入如：192.168.0.1或192.168.0.1:1234或http://www.xxx.xxx的有效地址</string>
+    <string name="activity_login_ensure">确定</string>
+
+    <!-- 类别 -->
+    <string name="activity_type_item_01">财经政策</string>
+    <string name="activity_type_item_02">法律法规</string>
+    <string name="activity_type_item_03">政策解读</string>
+    <string name="activity_type_item_04">财经简讯</string>
+    <string name="activity_type_item_05">江苏财经概况</string>
+    <string name="activity_type_item_06">工作汇报</string>
+    <string name="activity_type_item_07">部门预算</string>
+    <string name="activity_type_item_08">预算执行</string>
+    <string name="activity_type_item_09">工作报告</string>
+    <string name="activity_type_item_10">依法行政</string>
+    <string name="activity_type_item_01_for_login">财经政策</string>
+    <string name="activity_type_item_02_for_login">法律法规</string>
+    <string name="activity_type_item_03_for_login">政策解读</string>
+    <string name="activity_type_item_04_for_login">财经\n简讯</string>
+    <string name="activity_type_item_05_for_login">江苏财经\n概况</string>
+    <string name="activity_type_item_06_for_login">工作管理</string>
+    <string name="activity_type_recognition_devide_fail">设备匹配失败，请重试</string>
+    <string name="activity_type_recognition_devide_reset">重试</string>
+    <string name="activity_type_recognition_devide_exit">退出</string>
+
+    <!-- 修改密码 -->
+    <string name="activity_modify_pass_username">用&#160;&#160;户&#160;&#160;名:</string>
+    <string name="activity_modify_pass_old">原&#160;&#160;密&#160;&#160;码:</string>
+    <string name="activity_modify_pass_new">新码一次:</string>
+    <string name="activity_modify_pass_ensure">新码二次:</string>
+    <string name="activity_modify_pass_modify">修&#160;&#160;改</string>
+    <string name="activity_modify_pass_cancel">取&#160;&#160;消</string>
+    <string name="activity_modify_pass_success">修改成功</string>
+    <string name="activity_modify_pass_fill_error">信息填写不完整</string>
+    <string name="activity_modify_pass_twice_error">两次输入新密码不一致</string>
+
+    <!-- 搜索页面 -->
+    <string name="activity_search_back">返回</string>
+    <string name="activity_search_input_key">请输入关键字</string>
+    <string name="activity_search_search">搜&#160;&#160;索</string>
+    <string name="activity_search_department">部门:</string>
+    <string name="activity_search_year">年度:</string>
+    <string name="activity_search_number">文号:</string>
+    <string name="activity_search_title">标题</string>
+    <string name="activity_search_list_year">年度</string>
+    <string name="activity_search_all_depart">所有部门</string>
+    <string name="activity_search_all_year">所有年度</string>
+    <string name="activity_search_input_number">请输入文号</string>
+    <string name="activity_search_not_data">没有更多数据了</string>
+    <string name="activity_search_refush">新汇报</string>
+    <!-- 详情 -->
+    <string name="activity_detail_collect">收藏</string>
+    <string name="activity_detail_cancel_collect">取消收藏</string>
+    <string name="activity_detail_downloading">正在下载</string>
+    <string name="activity_detail_download_wps">正在下载WPS</string>
+    <string name="activity_detail_body_title">正文：</string>
+    <string name="serach_email_list">查询结果为空</string>
+    <string name="activity_detail_file_title">附件：</string>
+    <string name="activtiy_detail_relative_title">关联：</string>
+    <string name="activity_detail_resource_not_exist">请求的资源不存在</string>
+    <string name="open_pdf">打开文档</string>
+    <string name="open_pdf_uninstall_wps">当前未安装WPS Office,是否打开安卓市场安装？</string>
+    <string name="open_pdf_positive_button">打开</string>
+    <string name="open_pdf_fail">无法打开文档!</string>
+
+    <!-- 下载相关 -->
+    <string name="activity_sdcard_not_mount">储存设备未就绪</string>
+    <string name="activity_sdcard_usable_vol_unEnough">储存空间不足</string>
+    <string name="activity_sdcard_file_max">文件个数已经达到最大值</string>
+    <string name="activity_download_file_fail">文件下载失败!</string>
+
+</resources>

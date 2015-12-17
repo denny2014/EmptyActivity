@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="3" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="@drawable/second_image_parting_line"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:weightSum="2" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/btn_type_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="25dp"
+                    android:src="@drawable/img_menu_item_7_new" />
+
+                <TextView
+                    style="@style/style_type_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="35dp"
+                    android:text="@string/activity_type_item_07" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/btn_type_8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="25dp"
+                    android:src="@drawable/img_menu_item_8_new" />
+
+                <TextView
+                    style="@style/style_type_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="35dp"
+                    android:text="@string/activity_type_item_08" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/btn_type_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="25dp"
+                    android:src="@drawable/img_menu_item_9_new" />
+
+                <TextView
+                    style="@style/style_type_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="35dp"
+                    android:text="@string/activity_type_item_09" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/btn_type_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="25dp"
+                    android:src="@drawable/img_menu_item_0_new" />
+
+                <TextView
+                    style="@style/style_type_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="35dp"
+                    android:text="@string/activity_type_item_10" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

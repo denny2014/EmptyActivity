@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--适配华为X1 7.0 -->
+  <!--登录-->
+  <dimen name="activity_login_padding">10dp</dimen>
+
+  <!--选择菜单-->
+  <dimen name="activity_type_item_height">130dp</dimen>
+</resources>

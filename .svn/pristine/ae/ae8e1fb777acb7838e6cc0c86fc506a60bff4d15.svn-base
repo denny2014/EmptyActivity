@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BaseActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/simple_gray"
+        android:orientation="vertical" >
+
+        <include layout="@layout/action_top" />
+
+        <LinearLayout
+            android:id="@+id/search_list_editview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/activity_search_input_padding_top"
+            android:paddingLeft="@dimen/activity_search_input_padding_left"
+            android:paddingRight="@dimen/activity_search_input_padding_left"
+            android:paddingTop="@dimen/activity_search_input_padding_top" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_login_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_search_input_padding_top"
+                    android:src="@drawable/ic_search_new" />
+
+                <EditText
+                    android:id="@+id/etKey"
+                    style="@style/style_login_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/activity_search_input_key" />
+                <!--
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_search_input_padding_top"
+                    android:src="@drawable/ic_search_menu" />
+                -->
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_login_text_padding"
+                android:background="@drawable/btn_search"
+                android:paddingBottom="@dimen/activity_login_text_padding"
+                android:paddingLeft="@dimen/activity_login_text_padding"
+                android:paddingRight="@dimen/activity_login_text_padding"
+                android:paddingTop="@dimen/activity_login_text_padding"
+                android:text="@string/activity_search_search"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_micro" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/search_list_editview_news"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:paddingBottom="@dimen/activity_search_input_padding_top"
+            android:paddingLeft="@dimen/activity_search_input_padding_left"
+            android:paddingRight="@dimen/activity_search_input_padding_left"
+            android:paddingTop="@dimen/activity_search_input_padding_top" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_login_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_search_input_padding_top"
+                    android:src="@drawable/ic_search_new" />
+
+                <EditText
+                    android:id="@+id/etKey_news"
+                    style="@style/style_login_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/activity_search_input_key" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="fill_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="@color/black" />
+
+                <TextView
+                    android:id="@+id/etKey_news_time"
+                    style="@style/style_login_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/activity_search_input_key_time" />
+                <!--
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_search_input_padding_top"
+                    android:src="@drawable/ic_search_menu" />
+                -->
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_search_news"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_login_text_padding"
+                android:background="@drawable/btn_search"
+                android:paddingBottom="@dimen/activity_login_text_padding"
+                android:paddingLeft="@dimen/activity_login_text_padding"
+                android:paddingRight="@dimen/activity_login_text_padding"
+                android:paddingTop="@dimen/activity_login_text_padding"
+                android:text="@string/activity_search_search"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_micro" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/list_search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false" >
+
+            <ImageView
+                android:layout_width="@dimen/activity_search_triangle"
+                android:layout_height="@dimen/activity_search_triangle"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="@dimen/activity_search_triangle_padding"
+                android:layout_marginRight="@dimen/activity_search_triangle_margin_right"
+                android:layout_marginTop="@dimen/activity_search_triangle_padding"
+                android:src="@drawable/ic_triangle"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_search_content_padding"
+                android:layout_marginRight="@dimen/activity_search_content_padding"
+                android:layout_marginTop="@dimen/activity_search_content_margin_top"
+                android:background="@drawable/bg_search_select"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/activity_search_content_padding"
+                android:paddingLeft="@dimen/activity_search_content_padding"
+                android:paddingRight="@dimen/activity_search_content_padding"
+                android:paddingTop="@dimen/activity_search_content_padding" >
+
+                <!--
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/activity_search_department"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+                -->
+
+                <TextView
+                    android:id="@+id/tv_department"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="@drawable/bg_login_input"
+                    android:drawableRight="@drawable/ic_arrow"
+                    android:ellipsize="end"
+                    android:padding="@dimen/activity_search_select_white_padding"
+                    android:singleLine="true"
+                    android:text="所有部门"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginRight="3dp"
+                    android:background="@color/gray" />
+                <!--
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/activity_search_select_content_padding_bottom"
+                    android:paddingRight="@dimen/activity_search_select_content_padding_bottom"
+                    android:text="@string/activity_search_year"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+                -->
+
+                <TextView
+                    android:id="@+id/tv_serarch_year"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="@drawable/bg_login_input"
+                    android:drawableRight="@drawable/ic_arrow"
+                    android:ellipsize="end"
+                    android:padding="@dimen/activity_search_select_white_padding"
+                    android:singleLine="true"
+                    android:text="所有年度"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginRight="3dp"
+                    android:background="@color/gray" />
+                <!--
+                     <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/activity_search_select_content_padding_bottom"
+                    android:paddingRight="@dimen/activity_search_select_content_padding_bottom"
+                    android:text="@string/activity_search_number"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+                -->
+
+                <EditText
+                    android:id="@+id/et_search_number"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="@drawable/bg_login_input"
+                    android:hint="@string/activity_search_list_hint"
+                    android:padding="@dimen/activity_search_select_white_padding"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_micro" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/list_title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:padding="@dimen/activity_search_select_white_padding"
+                android:text="@string/activity_search_title"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="@dimen/activity_search_select_white_padding"
+                android:text="@string/activity_search_list_year"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_line_width"
+            android:background="#D6D7D8" />
+
+        <com.zet.pull.PullToRefreshLayout
+            android:id="@+id/refresh_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <include layout="@layout/refresh_head" />
+            <!-- 支持所有实现Pullable接口的View -->
+
+            <com.zet.pull.PullableListView
+                android:id="@+id/lv_content_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/simple_gray"
+                android:divider="@color/gray"
+                android:dividerHeight="1dp"
+                android:listSelector="@android:color/transparent" />
+
+            <include layout="@layout/load_more" />
+        </com.zet.pull.PullToRefreshLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_goto_top"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="@dimen/activity_search_goto_top_margin"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/zet_top_new" />
+
+</FrameLayout>

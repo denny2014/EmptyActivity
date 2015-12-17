@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!--欢迎-->
+  <dimen name="activity_loading_soft_margin_bottom">40dp</dimen>
+  <dimen name="activity_loading_soft_text_margin_bottom">15dp</dimen>
+  <!--登录-->
+  <dimen name="activity_login_margin_padding_left_right">30dp</dimen>
+  <dimen name="activity_login_text_padding">8dp</dimen>
+  <dimen name="activity_login_text_margin_top">20dp</dimen>
+  <dimen name="activity_login_corner">5dp</dimen>
+  <dimen name="activity_login_submit_padding_left">25dp</dimen>
+  <dimen name="activity_login_padding">0dp</dimen>
+  <dimen name="activity_login_setting_padding">20dp</dimen>
+
+  <!--类型(选择菜单)页面-->
+  <dimen name="activity_type_padding">22dp</dimen>
+  <dimen name="activity_type_item_spacing">15dp</dimen>
+  <dimen name="activity_type_margin_top">25dp</dimen>
+  <dimen name="activity_type_item_height">105dp</dimen>
+  <dimen name="activity_type_drawable_padding">18dp</dimen>
+
+  <!--修改密码-->
+  <dimen name="activity_modify_pass_inner_padding">10dp</dimen>
+
+  <!--搜索-->
+  <dimen name="activity_search_help_width">25dp</dimen>
+  <dimen name="activity_search_collect_width">75dp</dimen>
+  <dimen name="activity_search_top_padding">8dp</dimen>
+  <dimen name="activity_search_top_padding_top">12dp</dimen>
+  <dimen name="activity_search_input_padding_top">3dp</dimen>
+  <dimen name="activity_search_input_padding_left">12dp</dimen>
+  <dimen name="activity_search_goto_top_margin">25dp</dimen>
+
+  <dimen name="activity_search_triangle">25dp</dimen>
+  <dimen name="activity_search_triangle_padding">8dp</dimen>
+  <dimen name="activity_search_triangle_margin_right">21dp</dimen>
+  <dimen name="activity_search_content_margin_top">12dp</dimen>
+  <dimen name="activity_search_select_white_padding">8dp</dimen>
+  <dimen name="activity_search_select_content_padding_bottom">4dp</dimen>
+  <dimen name="activity_search_content_padding">8dp</dimen>
+
+  <dimen name="activity_search_item_padding_left">10dp</dimen>
+  <dimen name="activity_search_item_padding_top">18dp</dimen>
+
+  <!--年度和部门选择-->
+  <dimen name="activity_select_item_padding_left">15dp</dimen>
+  <dimen name="activity_select_item_padding_top">10dp</dimen>
+
+  <!--详情-->
+  <dimen name="activity_detail_padding_left_right">8dp</dimen>
+  <dimen name="activity_detail_title_padding">15dp</dimen>
+  <dimen name="activity_detail_item_margin_top">5dp</dimen>
+  <dimen name="activity_detail_item_content_margin_left">6dp</dimen>
+  <dimen name="activity_detail_item_content_padding_left">25dp</dimen>
+</resources>

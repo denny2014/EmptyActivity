@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/action_top" />
+
+    <RelativeLayout
+        android:id="@+id/select_service_view01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:padding="5dp" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="服务器一"
+            android:textSize="@dimen/text_mediumn" />
+
+        <ImageView
+            android:id="@+id/select_service_image01"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/select_services_selected" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <RelativeLayout
+        android:id="@+id/select_service_view02"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:padding="5dp" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="服务器二"
+            android:textSize="@dimen/text_mediumn" />
+
+        <ImageView
+            android:id="@+id/select_service_image02"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/select_services_normal" />
+    </RelativeLayout>
+
+</LinearLayout>

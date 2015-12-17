@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/activity_search_item_padding_top"
+    android:paddingLeft="@dimen/activity_search_item_padding_left"
+    android:paddingRight="@dimen/activity_search_item_padding_left"
+    android:paddingTop="@dimen/activity_search_item_padding_top" >
+
+    <TextView
+        android:id="@+id/tvResultName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:text="标题"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_mediumn_small" />
+
+    <TextView
+        android:id="@+id/tvResultYear"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_search_item_padding_left"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:text="2015"
+        android:textColor="#00CCF5"
+        android:textSize="@dimen/text_small" />
+
+</LinearLayout>

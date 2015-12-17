@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_default_loading"
+    android:gravity="bottom|center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_company"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_loading_soft_text_margin_bottom"
+        android:gravity="center"
+        android:text="@string/default_compnay_des"
+        android:textColor="#001c58"
+        android:textSize="@dimen/text_small"
+        android:visibility="gone" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_soft_zhengcai" />
+
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_loading_soft_margin_bottom"
+        android:layout_marginTop="8dp"
+        android:text="@string/version"
+        android:textColor="#90CBE9"
+        android:textSize="@dimen/text_small" />
+
+</LinearLayout>

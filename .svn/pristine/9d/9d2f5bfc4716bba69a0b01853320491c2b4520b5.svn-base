@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:clipChildren="false"
+        android:background="@drawable/bg_type"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            >
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_back"
+                android:padding="@dimen/activity_type_padding"
+                android:id="@+id/btn_back"
+                />
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="vertical"
+            android:padding="@dimen/activity_type_padding"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/activity_type_margin_top"
+            android:gravity="top"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="3"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/btn_type_1"
+                    android:text="@string/activity_type_item_01"
+                    android:drawableTop="@drawable/img_menu_item_1"
+                    style="@style/style_type_button"/>
+
+            <TextView
+                    style="@style/style_type_button"
+                    android:id="@+id/btn_type_2"
+                    android:layout_width="0dp"
+                    android:drawableTop="@drawable/img_menu_item_2"
+                    android:layout_weight="1"
+                    android:text="@string/activity_type_item_02"/>
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:id="@+id/btn_type_3"
+                    android:drawableTop="@drawable/img_menu_item_3"
+                    android:layout_weight="1"
+                    android:text="@string/activity_type_item_03"
+                    style="@style/style_type_button"/>
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="3"
+                android:gravity="bottom"
+                android:layout_marginTop="@dimen/activity_type_margin_top"
+                android:orientation="horizontal">
+
+            <TextView
+                    style="@style/style_type_button"
+                    android:id="@+id/btn_type_5"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/img_menu_item_4"
+                    android:text="@string/activity_type_item_05"/>
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/img_menu_item_5"
+                    android:id="@+id/btn_type_4"
+                    android:text="@string/activity_type_item_04"
+                    style="@style/style_type_button"/>
+
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/img_menu_item_6"
+                    android:id="@+id/btn_type_6"
+                    android:text="@string/activity_type_item_06"
+                    style="@style/style_type_button"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

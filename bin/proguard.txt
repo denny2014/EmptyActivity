@@ -1,0 +1,73 @@
+# view 1952x1536/res/layout-1952x1536/activity_type.xml #generated:31
+# view res/layout/activity_type.xml #generated:31
+-keep class android.support.v4.view.ViewPager { <init>(...); }
+
+# view AndroidManifest.xml #generated:163
+-keep class cn.jpush.android.service.AlarmReceiver { <init>(...); }
+
+# view AndroidManifest.xml #generated:121
+-keep class cn.jpush.android.service.DownloadService { <init>(...); }
+
+# view AndroidManifest.xml #generated:141
+-keep class cn.jpush.android.service.PushReceiver { <init>(...); }
+
+# view AndroidManifest.xml #generated:128
+-keep class cn.jpush.android.service.PushService { <init>(...); }
+
+# view AndroidManifest.xml #generated:108
+-keep class cn.jpush.android.ui.PushActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:39
+-keep class com.zet.ApplicationContext { <init>(...); }
+
+# view AndroidManifest.xml #generated:85
+-keep class com.zet.activity.DepartMentSelectActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:93
+-keep class com.zet.activity.EmailDetailActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:44
+-keep class com.zet.activity.EmptyActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:81
+-keep class com.zet.activity.InfoDetailActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:55
+-keep class com.zet.activity.LoadingActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:60
+-keep class com.zet.activity.LoginActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:89
+-keep class com.zet.activity.LoginEmailActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:68
+-keep class com.zet.activity.ModifyPassActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:64
+-keep class com.zet.activity.ModifyServiceActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:101
+-keep class com.zet.activity.MonthAndDaySelectActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:97
+-keep class com.zet.activity.NewsInBriefInfoDetailActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:77
+-keep class com.zet.activity.SearchListActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:72
+-keep class com.zet.activity.TypeActivity { <init>(...); }
+
+# view res/layout/activity_search_list.xml #generated:418
+-keep class com.zet.pull.PullToRefreshLayout { <init>(...); }
+
+# view res/layout/activity_search_list.xml #generated:426
+-keep class com.zet.pull.PullableListView { <init>(...); }
+
+# view AndroidManifest.xml #generated:126
+-keep class com.zet.utils.RefreshEmailList { <init>(...); }
+
+# view res/layout/item_detail_tiyao.xml #generated:19
+-keep class com.zet.view.EnhanceWordWrapTextView { <init>(...); }
+

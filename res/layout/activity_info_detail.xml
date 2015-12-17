@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simple_gray"
+    android:orientation="vertical" >
+
+    <include layout="@layout/action_top" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_detail_padding_left_right"
+              >
+
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_doc_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="@dimen/activity_detail_title_padding"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_big" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/llt_tiyao_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <LinearLayout android:id="@+id/layout_zhengwen"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|left"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/activity_detail_item_margin_top" >
+
+                <TextView
+                    android:id="@+id/tv_file_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:lineSpacingMultiplier="1.3"
+                    android:singleLine="true"
+                    android:text="@string/activity_detail_body_title"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_big"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_body_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_detail_item_content_margin_left"
+                    android:lineSpacingMultiplier="1.3"
+                    android:paddingLeft="@dimen/activity_detail_item_content_padding_left"
+                    android:paddingRight="@dimen/activity_detail_item_content_padding_right"
+                    android:singleLine="false"
+                    android:textColor="#ff0000"
+                    android:textSize="@dimen/text_mediumn" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|left"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/activity_detail_item_margin_top" >
+
+                <TextView
+                    android:id="@+id/tv_body_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:lineSpacingMultiplier="1.3"
+                    android:singleLine="true"
+                    android:text="@string/activity_detail_file_title"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_mediumn"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/llt_fujian_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_detail_item_content_margin_left"
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/activity_detail_item_content_padding_left"
+                    android:paddingRight="@dimen/activity_detail_item_content_padding_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|left"
+                android:orientation="vertical" android:visibility="gone"
+                android:paddingTop="@dimen/activity_detail_item_margin_top" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:lineSpacingMultiplier="1.3"
+                    android:singleLine="true"
+                    android:text="@string/activtiy_detail_relative_title"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_mediumn"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/llt_relative_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_detail_item_content_margin_left"
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/activity_detail_item_content_padding_left"
+                    android:paddingRight="@dimen/activity_detail_item_content_padding_right" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

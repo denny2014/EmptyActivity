@@ -1,0 +1,104 @@
+package com.zet.activity;
+
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+
+import com.bdkj.bdlibrary.utils.LConfigUtils;
+import com.bdkj.bdlibrary.utils.ToastUtils;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.event.OnClick;
+import com.zet.ApplicationContext;
+import com.zet.BaseActivity;
+import com.zet.R;
+import com.zet.utils.InterfaceConst;
+
+/**
+ * 邮箱登陆界面 Cread By ZJY on 15/07/24
+ */
+@ContentView(R.layout.activity_email_login)
+public class LoginEmailActivity extends BaseActivity {
+	private String docType = null;
+	@ViewInject((R.id.et_email_username))
+	EditText etemail_Username;
+	@ViewInject((R.id.et_email_password))
+	EditText etemail_Password;
+	@ViewInject((R.id.email_rememberPsw))
+	CheckBox cemail_Remember;
+
+	SharedPreferences emailSetting;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			docType = savedInstanceState.getString("docType");
+		} else {
+			docType = getIntent().getStringExtra("docType");
+		}
+		initView();
+	}
+
+	private void initView() {
+		// TODO Auto-generated method stub
+		emailSetting = LConfigUtils.getPreferences(this,
+				InterfaceConst.emailSetting);
+		String emailUsername = emailSetting.getString(InterfaceConst.emailname,
+				"");
+		String emailPssword = emailSetting.getString(
+				InterfaceConst.emailpassword, "");
+		boolean emailChecked = emailSetting.getBoolean(
+				InterfaceConst.emailisChecked, false);
+		etemail_Username.setText(emailUsername);
+		etemail_Username.setText("z348433702@126.com");
+		etemail_Password.setText(emailPssword);
+		etemail_Password.setText("githgpsjaxmuejhu");
+		cemail_Remember.setChecked(emailChecked);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("docType", docType);
+	}
+
+	@OnClick({ R.id.btn_email_login })
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btn_email_login:
+			String username = etemail_Username.getText().toString();
+			String password = etemail_Password.getText().toString();
+			if (TextUtils.isEmpty(username)) {
+				ToastUtils.showError(mContext,
+						R.string.activity_login_username_disallow_null);
+			} else if (TextUtils.isEmpty(password)) {
+				ToastUtils.showError(mContext,
+						R.string.activity_login_pass_disallow_null);
+			} else {
+				saveEmailMessage();
+				Bundle bundle = new Bundle();
+				bundle.putString("docType", docType);
+				ApplicationContext.showSearch(mContext, bundle);
+			}
+			break;
+		}
+	}
+
+	private void saveEmailMessage() {
+		SharedPreferences.Editor editor = emailSetting.edit();
+		editor.putString(InterfaceConst.emailname, cemail_Remember
+				.isChecked() ? etemail_Username.getText().toString()
+				: "");
+		editor.putString(InterfaceConst.emailpassword, cemail_Remember
+				.isChecked() ? etemail_Password.getText().toString()
+				: "");
+		editor.putBoolean(InterfaceConst.emailisChecked,
+				cemail_Remember.isChecked());
+		editor.commit();
+	}
+}

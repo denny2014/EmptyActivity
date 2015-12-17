@@ -1,0 +1,311 @@
+package com.zet.activity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+import javax.mail.internet.MimeMessage;
+
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import com.bdkj.bdlibrary.utils.DialogUtils;
+import com.bdkj.bdlibrary.utils.FileUtils;
+import com.bdkj.bdlibrary.utils.LConfigUtils;
+import com.bdkj.bdlibrary.utils.StorageUtils;
+import com.bdkj.bdlibrary.utils.ToastUtils;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.event.OnClick;
+import com.lidroid.xutils.utils.LogUtils;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.pop3.POP3Folder;
+import com.zet.ApplicationContext;
+import com.zet.BaseActivity;
+import com.zet.Constants;
+import com.zet.R;
+import com.zet.db.SQLiteUtils;
+import com.zet.email.ReciveOneMail;
+import com.zet.model.ReciveOneMailDB;
+import com.zet.utils.InterfaceConst;
+import com.zet.utils.PdfUtils;
+
+/**
+ * 邮箱登陆界面 Cread By ZJY on 15/07/24
+ */
+@ContentView(R.layout.activity_email_login)
+public class LoginEmailActivity extends BaseActivity {
+	private String docType = null;
+	@ViewInject((R.id.login_email))
+	RelativeLayout login_email;
+	@ViewInject((R.id.select_email_type))
+	RelativeLayout select_email_type;
+	@ViewInject((R.id.et_email_username))
+	EditText etemail_Username;
+	@ViewInject((R.id.et_email_password))
+	EditText etemail_Password;
+	@ViewInject((R.id.email_rememberPsw))
+	CheckBox cemail_Remember;
+	@ViewInject(R.id.iv_collect)
+	ImageView iv_collect;
+	String username;
+	String password;
+	private boolean reload = true;
+	String emailEnd = "";
+	SharedPreferences emailSetting;
+	protected ProgressDialog dialog;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			docType = savedInstanceState.getString("docType");
+		} else {
+			docType = getIntent().getStringExtra("docType");
+		}
+		iv_collect.setVisibility(View.GONE);
+		initView();
+	}
+
+	private void initView() {
+		// TODO Auto-generated method stub
+		emailSetting = LConfigUtils.getPreferences(this,
+				InterfaceConst.emailSetting);
+		boolean havaAlreadyLogin = emailSetting.getBoolean("isFirstLogin",
+				false);
+		if (havaAlreadyLogin) {
+			login_email.setVisibility(View.VISIBLE);
+			select_email_type.setVisibility(View.GONE);
+		} else {
+			login_email.setVisibility(View.GONE);
+			select_email_type.setVisibility(View.VISIBLE);
+		}
+		String emailUsername = emailSetting.getString(InterfaceConst.emailname,
+				"");
+		String emailPssword = emailSetting.getString(
+				InterfaceConst.emailpassword, "");
+		emailEnd = emailSetting.getString("emailEnd", "");
+		boolean emailChecked = emailSetting.getBoolean(
+				InterfaceConst.emailisChecked, false);
+		etemail_Username.setText(emailUsername);
+		// etemail_Username.setText("z348433702@126.com");
+		etemail_Password.setText(emailPssword);
+		if(emailUsername.contains("@126")){
+			etemail_Password.setText("githgpsjaxmuejhu");
+		}else if(emailUsername.contains("@qq")){
+			etemail_Password.setText("ying.89618");
+		}
+		cemail_Remember.setChecked(emailChecked);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("docType", docType);
+	}
+
+	@OnClick({ R.id.btn_email_login, R.id.email_select_126,
+			R.id.email_select_qq, R.id.tv_back,R.id.iv_help })
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btn_email_login:
+			username = etemail_Username.getText().toString();
+			password = etemail_Password.getText().toString();
+			String userEmail = username.split("@")[0];
+			if (TextUtils.isEmpty(userEmail)) {
+				ToastUtils.showError(mContext,
+						R.string.activity_login_username_disallow_null);
+			} else if (TextUtils.isEmpty(password)) {
+				ToastUtils.showError(mContext,
+						R.string.activity_login_pass_disallow_null);
+			} else {
+				dialog = DialogUtils
+						.showLoading(mContext, mContext
+								.getString(R.string.dialog_email_loading), true);
+				dialog.setCanceledOnTouchOutside(false);
+				refuseGetNewEmail();
+			}
+			break;
+		case R.id.email_select_126:
+			login_email.setVisibility(View.VISIBLE);
+			select_email_type.setVisibility(View.GONE);
+			emailEnd = "z348433702@126.com";
+			etemail_Username.setText(emailEnd);
+			break;
+		case R.id.email_select_qq:
+			login_email.setVisibility(View.VISIBLE);
+			select_email_type.setVisibility(View.GONE);
+			emailEnd = "1779962513@qq.com";
+			etemail_Username.setText(emailEnd);
+			etemail_Password.setText("ying.89618");
+			break;
+		case R.id.tv_back:
+			finish();
+			break;
+		case R.id.iv_help:
+			if (!StorageUtils.isMount()) {
+				ToastUtils.showWarn(mContext,
+						R.string.activity_sdcard_not_mount);
+			} else {
+				File file = new File(StorageUtils.getStorageFile(),
+						Constants.ROOT_DIRECTION + "/userGuide.pdf");
+				if (!file.exists()) {
+					boolean success = false;
+					FileUtils.createFolder(file.getParentFile());
+					FileUtils.createFile(file);
+					InputStream stream = null;
+					try {
+						stream = mContext.getAssets().open("userGuide.pdf");
+						FileUtils.writeFile(file, stream);
+						success = true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						if (stream != null) {
+							try {
+								stream.close();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					if (success) {
+						PdfUtils.openPDF(mContext, file.getAbsolutePath());
+					} else {
+						ToastUtils.showError(mContext, R.string.open_pdf_fail);
+						FileUtils.deleteFile(file);
+					}
+				} else {
+					PdfUtils.openPDF(mContext, file.getAbsolutePath());
+				}
+			}
+			break;
+		}
+	}
+
+	private void refuseGetNewEmail() {
+		if (dialog != null) {
+			dialog.show();
+		}
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					do {
+						receiverEmail();
+					} while (reload);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mHandler.sendEmptyMessage(0);
+				}
+			}
+		}).start();
+	}
+
+	Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case 0:
+				ToastUtils.show(mContext, "邮箱验证失败，请重试");
+				dialog.dismiss();
+				break;
+			case 1:
+				dialog.dismiss();
+				saveEmailMessage();
+				break;
+			}
+		};
+	};
+
+	public void receiverEmail() {
+		String[] emailUsernames = username.split("@");
+		Properties props = System.getProperties();
+		Session session = null;
+		URLName urln = null;
+		Store store = null;
+		try {
+		if (username.contains("@126")) {
+			props.put("mail.smtp.host", "smtp.126.com");
+			props.put("mail.smtp.post", 25);
+			props.put("mail.smtp.auth", true);
+			session = Session.getDefaultInstance(props, null);
+			urln = new URLName("pop3", "pop3.126.com", 110, null,
+					emailUsernames[0], password);
+				store = session.getStore(urln);
+			store.connect();
+		} else if (username.contains("@qq")
+				|| username.contains("@QQ")) {
+			String host = "imap.qq.com";
+			String port = "143";
+			props.setProperty("mail.imap.socketFactory.port", port);
+			props.setProperty("mail.store.protocol", "imap");
+			props.setProperty("mail.imap.host", host);
+			props.setProperty("mail.imap.port", port);
+			props.setProperty("mail.imap.auth.login.disable", "true");
+			session = Session.getDefaultInstance(props, null);
+			session.setDebug(false);
+			store = session.getStore("imap");
+			store.connect(host, emailUsernames[0], password);
+		}
+		Folder folder = store.getFolder("INBOX");
+		folder.open(Folder.READ_ONLY);
+		Message message[] = folder.getMessages();
+		Log.d("Dream", "Messages's length: " + message.length);
+		if (message.length > 0) {
+			reload = false;
+			Bundle bundle = new Bundle();
+			bundle.putString("docType", docType);
+			ApplicationContext.showSearch(mContext, bundle);
+			finish();
+		} else {
+			mHandler.sendEmptyMessage(0);
+		}
+		mHandler.sendEmptyMessage(1);
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void saveEmailMessage() {
+		SharedPreferences.Editor editor = emailSetting.edit();
+		editor.putString(InterfaceConst.emailname,
+				cemail_Remember.isChecked() ? etemail_Username.getText()
+						.toString() : "");
+		editor.putString("emailEnd", emailEnd);
+		editor.putString(InterfaceConst.emailpassword, cemail_Remember
+				.isChecked() ? etemail_Password.getText().toString() : "");
+		editor.putBoolean(InterfaceConst.emailisChecked,
+				cemail_Remember.isChecked());
+		editor.putBoolean("isFirstLogin", true);
+		editor.putBoolean("havaAlreadyLogin", true);
+		editor.commit();
+	}
+}

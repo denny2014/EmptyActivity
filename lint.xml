@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="ContentDescription">
+        <ignore path="res/layout-1952x1536/activity_type.xml" />
+    </issue>
+</lint>

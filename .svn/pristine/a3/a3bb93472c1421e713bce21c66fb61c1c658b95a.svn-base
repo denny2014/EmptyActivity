@@ -1,0 +1,481 @@
+package com.zet.db;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.mail.MessagingException;
+
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
+
+import com.zet.email.ReciveOneMail;
+import com.zet.model.DocInfo;
+import com.zet.model.ReciveOneMailDB;
+import com.zet.parser.ATTACH;
+import com.zet.parser.DETAIL;
+import com.zet.parser.RSSFeed;
+
+/**
+ * 数据库工具类 Created by macchen on 15/4/10.
+ */
+public class SQLiteUtils {
+
+	private static class SQLiteUtilsInstance {
+		public static SQLiteUtils utils = new SQLiteUtils();
+	}
+
+	private static SQLiteDatabase database = null;
+
+	private SQLiteUtils() {
+	}
+
+	/**
+	 * 获取数据库单例
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static SQLiteUtils getInstance(Context context) {
+		if (database == null) {
+			BaseSQLHelper helper = new BaseSQLHelper(context);
+			database = helper.getWritableDatabase();
+		}
+		return SQLiteUtilsInstance.utils;
+	}
+
+	/**
+	 * 添加邮件到数据库
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public long addEmailToDB(ReciveOneMail mReciveOneMail,
+			boolean isContainAttach, String userid, String emailAddress,
+			String appfileName) {
+		ContentValues values = new ContentValues();
+		try {
+			values.put("userid", userid);
+			values.put("subject", mReciveOneMail.getSubject());
+			values.put("sentDate", mReciveOneMail.getSentDate());
+			values.put("replysign", "" + mReciveOneMail.getReplySign());
+			values.put("hasRead", "" + mReciveOneMail.isNew());
+			values.put("containAttachment", "" + isContainAttach);
+			values.put("form", mReciveOneMail.getFrom());
+			values.put("topeople", mReciveOneMail.getMailAddress("to"));
+			values.put("ccpeople", mReciveOneMail.getMailAddress("cc"));
+			values.put("messageid", mReciveOneMail.getMessageId());
+			values.put("bodycontent", mReciveOneMail.getBodyText());
+			values.put("emailAddress", emailAddress);
+			values.put("appfileName", appfileName);
+
+			values.put("emailVisual", "" + false);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long index = database.insert("emaillist", null, values);
+		return index;
+	}
+
+	/**
+	 * 添加EmailWorks到数据库
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public long addEmailWorksToDB(RSSFeed mRSSFeed, String userid,
+			String emailAddress) {
+		ContentValues values = new ContentValues();
+		try {
+			values.put("admdivCode", mRSSFeed.getADMDIV_CODE());
+			values.put("setyear", mRSSFeed.getSET_YEAR());
+			values.put("docYear", mRSSFeed.getDOC_YEAR());
+			values.put("divCode", mRSSFeed.getDIV_CODE());
+			values.put("prjCode", mRSSFeed.getPRJ_CODE());
+			values.put("fileId", mRSSFeed.getFILE_ID());
+			values.put("title", mRSSFeed.getTITLE());
+			values.put("peportDate", mRSSFeed.getREPORT_DAT());
+			values.put("depCode", mRSSFeed.getDEP_CODE());
+			values.put("depName", mRSSFeed.getDEP_NAME());
+			values.put("leader", mRSSFeed.getLEADER());
+			values.put("reportUser", mRSSFeed.getREPORT_USER());
+			values.put("fileNo", mRSSFeed.getFILE_NO());
+			values.put("leaderName", mRSSFeed.getLEADER_NAME());
+			values.put("reportType", mRSSFeed.getREPORT_TYPE());
+			values.put("detailsNum", mRSSFeed.getmDetailsItemCount());
+			values.put("attachNum", mRSSFeed.getmAttachsItemCount());
+			values.put("emailAddress", emailAddress);
+			values.put("userId", userid);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long index = database.insert("emailworks", null, values);
+		return index;
+	}
+
+	/**
+	 * 添加emaildetails到数据库
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public void addEmailDetailsToDB(List<DETAIL> mDetails, String userid,
+			String emailAddress, String detailId) {
+		ContentValues values = new ContentValues();
+		try {
+			for (DETAIL mDetail : mDetails) {
+				values.put("detailId", detailId);
+				values.put("setyear", mDetail.getSET_YEAR());
+				values.put("fileId", mDetail.getFILE_ID());
+				values.put("elementCode", mDetail.getELEMENT_CODE());
+				values.put("elementName", mDetail.getELEMENT_NAME());
+				values.put("procContent", mDetail.getPROC_CONTENT());
+				values.put("emailAddress", emailAddress);
+				values.put("userId", userid);
+				database.insert("emaildetails", null, values);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 添加emailattachs到数据库
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public void addEmailAttachsToDB(List<ATTACH> mAttachs, String userid,
+			String emailAddress) {
+		ContentValues values = new ContentValues();
+
+		try {
+			for (ATTACH attach : mAttachs) {
+				values.put("setyear", attach.getSET_YEAR());
+				values.put("fileId", attach.getFILE_ID());
+				values.put("fileType", attach.getFILE_TYPE());
+				values.put("attachId", attach.getATTACH_ID());
+				values.put("fileBin", attach.getFILE_BIN());
+				values.put("fileName", attach.getFILE_NAME());
+				values.put("emailAddress", emailAddress);
+				values.put("userId", userid);
+				database.insert("emailattachs", null, values);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressLint("NewApi")
+	public List<ATTACH> getEmailAttachsFromDb(String emailAddress, String emailUid) {
+		List<ATTACH> list = new ArrayList<ATTACH>();
+		String select = "select * from  emailattachs  where emailAddress = '"
+				+ emailAddress + "'  and userId = '" + emailUid + "'";
+		Cursor cursor = null;
+		cursor = database.rawQuery(select, null);
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				ATTACH info = new ATTACH();
+				info.setSET_YEAR(cursor.getString(cursor
+						.getColumnIndex("setyear")));
+				info.setFILE_ID(cursor.getString(cursor
+						.getColumnIndex("fileId")));
+				info.setFILE_TYPE(cursor.getString(cursor
+						.getColumnIndex("fileType")));
+				info.setATTACH_ID(cursor.getString(cursor
+						.getColumnIndex("attachId")));
+				info.setFILE_NAME(cursor.getString(cursor
+						.getColumnIndex("fileName")));
+				list.add(info);
+			}
+		}
+		cursor.close();
+		return list;
+	}
+
+	/**
+	 * 更新数据库
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+
+	public int emailUpdate(String fileId, String keyValue) {
+		ContentValues values = new ContentValues();
+		values.put(keyValue, "" + true);// key为字段名，value为值
+		return database.update("emaillist", values, "userid = ?",
+				new String[] { fileId });
+	}
+
+	/**
+	 * 查询本地是否存在
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+	public boolean emailIsExist(String fileId, String emailAddress) {
+		boolean isCollect = false;
+		String select = "select * from  emaillist  where emailAddress = '"
+				+ emailAddress + "'  and userid = '" + fileId + "'";
+		// Cursor cursor = database.query("emaillist", null, "userid=?",
+		// new String[] { fileId }, null, null, null);
+		Cursor cursor = database.rawQuery(select, null);
+		if (cursor != null && cursor.getCount() > 0) {
+			isCollect = true;
+		}
+		cursor.close();
+		return isCollect;
+	}
+
+	/**
+	 * 获取所有的邮件
+	 * 
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public List<ReciveOneMailDB> getEmailFromDb(int pageBagin, int pageEnd,
+			String emailName, String keyWords, String emailAddress) {
+		List<ReciveOneMailDB> list = new ArrayList<ReciveOneMailDB>();
+		// select * from table WHERE … LIMIT 10,20; #返回第10-20行数据
+		// +MessageColumn.email_yjId+" like '%"+SharedPreferencesUtils.getParam(context,
+		// SharedPreferencesUtils.Email_name,
+		// "testydbg2@jssz-n-tax.gov.cn")+"' and "
+		// + MessageColumn.email_lblx + "=" + sdm + "  order by "
+		String select = "select * from  emaillist  where emailAddress = '"
+				+ emailAddress + "'  and emailVisual = 'false' subject like '%"
+				+ keyWords + "%'   order by  sentDate  desc";
+		Cursor cursor = null;
+		if (TextUtils.isEmpty(keyWords)) {
+			cursor = database.query(false, "emaillist", null,
+					"emailVisual = 'false'", null, null, null, "_id DESC", ""
+							+ pageBagin + "," + pageEnd, null);
+		} else {
+			cursor = database.rawQuery(select, null);
+		}
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				ReciveOneMailDB info = new ReciveOneMailDB();
+				info.setUserid(cursor.getString(cursor.getColumnIndex("userid")));
+				info.setSubject(cursor.getString(cursor
+						.getColumnIndex("subject")));
+				info.setSentDate(cursor.getString(cursor
+						.getColumnIndex("sentDate")));
+				info.setReplysign(cursor.getString(cursor
+						.getColumnIndex("replysign")));
+				info.setHasRead(cursor.getString(cursor
+						.getColumnIndex("hasRead")));
+				info.setContainAttachment(cursor.getString(cursor
+						.getColumnIndex("containAttachment")));
+				info.setForm(cursor.getString(cursor.getColumnIndex("form")));
+				info.setTopeople(cursor.getString(cursor
+						.getColumnIndex("topeople")));
+				info.setCcpeople(cursor.getString(cursor
+						.getColumnIndex("ccpeople")));
+				info.setMessageid(cursor.getString(cursor
+						.getColumnIndex("messageid")));
+				info.setBodycontent(cursor.getString(cursor
+						.getColumnIndex("bodycontent")));
+				info.setAppfileName(cursor.getString(cursor
+						.getColumnIndex("appfileName")));
+				list.add(info);
+			}
+		}
+		cursor.close();
+		return list;
+	}
+
+	/**
+	 * 添加收藏
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public long addCollect(DocInfo info) {
+		ContentValues values = new ContentValues();
+		values.put("title", info.getTitle());
+		values.put("docYear", info.getDocYear());
+		values.put("fileID", info.getFileId());
+		values.put("fileName", info.getFileName());
+		values.put("fileheader", info.getFileHead());
+		values.put("filesize", info.getFileSize());
+		values.put("fileTitle", info.getFileTitle());
+		values.put("fileNo", info.getFileNo());
+		values.put("setYear", info.getSetYear());
+		return database.insert("collection", null, values);
+
+	}
+
+	/**
+	 * 删除收藏
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public int delCollect(int id) {
+		return database.delete("collection", "_id=?", new String[] { id + "" });
+	}
+
+	/**
+	 * 删除收藏
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+	public int delCollect(String fileId) {
+		return database.delete("collection", "fileID=?",
+				new String[] { fileId });
+	}
+
+	/**
+	 * 是否收藏
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+	public boolean isCollect(String fileId) {
+		boolean isCollect = false;
+		Cursor cursor = database.query("collection", null, "fileID=?",
+				new String[] { fileId }, null, null, null);
+		if (cursor != null && cursor.getCount() > 0) {
+			isCollect = true;
+		}
+		cursor.close();
+		return isCollect;
+	}
+
+	/**
+	 * 获取所有的收藏
+	 * 
+	 * @return
+	 */
+	public List<DocInfo> getCollect() {
+		List<DocInfo> list = new ArrayList<DocInfo>();
+		Cursor cursor = database.query("collection", null, null, null, null,
+				null, "_id DESC");
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				DocInfo info = new DocInfo();
+				info.setDocYear(cursor.getString(cursor
+						.getColumnIndex("docYear")));
+				info.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+				info.setFileId(cursor.getString(cursor.getColumnIndex("fileID")));
+				info.setId(cursor.getInt(cursor.getColumnIndex("_id")));
+				info.setFileName(cursor.getString(cursor
+						.getColumnIndex("fileName")));
+				info.setFileHead(cursor.getString(cursor
+						.getColumnIndex("fileheader")));
+				info.setFileSize(cursor.getInt(cursor
+						.getColumnIndex("filesize")));
+				info.setFileTitle(cursor.getString(cursor
+						.getColumnIndex("fileTitle")));
+				info.setFileNo(cursor.getString(cursor.getColumnIndex("fileNo")));
+				info.setSetYear(cursor.getString(cursor
+						.getColumnIndex("setYear")));
+				list.add(info);
+			}
+		}
+		cursor.close();
+		return list;
+	}
+
+	/**
+	 * 添加查看记录
+	 * 
+	 * @param info
+	 * @return
+	 */
+	/*
+	 * public long addRecord(DocInfo info) { ContentValues values = new
+	 * ContentValues(); values.put("title", info.getTitle());
+	 * values.put("docYear", info.getDocYear()); values.put("fileID",
+	 * info.getFileId()); values.put("fileName", info.getFileName());
+	 * values.put("fileheader", info.getFileHead()); values.put("filesize",
+	 * info.getFileSize()); values.put("fileTitle", info.getFileTitle());
+	 * values.put("fileNo", info.getFileName()); values.put("setYear",
+	 * info.getSetYear()); values.put("add_time", System.currentTimeMillis());
+	 * return database.insert("record", null, values); }
+	 */
+
+	/**
+	 * 删除查看记录
+	 * 
+	 * @param id
+	 * @return
+	 */
+	/*
+	 * public int delRecord(int id) { return database.delete("record", "_id=?",
+	 * new String[]{id + ""}); }
+	 */
+
+	/**
+	 * 删除查看记录
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+	/*
+	 * public int delRecord(String fileId) { return database.delete("record",
+	 * "fileID=?", new String[]{fileId}); }
+	 */
+
+	/**
+	 * 是否查看过
+	 * 
+	 * @param fileId
+	 * @return
+	 */
+	/*
+	 * public boolean isRecord(String fileId) { boolean isCollect = false;
+	 * Cursor cursor = database.query("record", null, "fileID=?", new
+	 * String[]{fileId}, null, null, null); if (cursor != null &&
+	 * cursor.getCount() > 0) { isCollect = true; } cursor.close(); return
+	 * isCollect; }
+	 */
+
+	/**
+	 * 获取所有的记录
+	 * 
+	 * @return
+	 */
+	/*
+	 * public List<RecordInfo> getAllRecord() { List<RecordInfo> list = new
+	 * ArrayList<RecordInfo>(); Cursor cursor = database.query("collection",
+	 * null, null, null, null, null, null); if (cursor != null &&
+	 * cursor.getCount() > 0) { while (cursor.moveToNext()) { RecordInfo info =
+	 * new RecordInfo();
+	 * info.setDocYear(cursor.getString(cursor.getColumnIndex("docYear")));
+	 * info.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+	 * info.setFileId(cursor.getString(cursor.getColumnIndex("fileID")));
+	 * info.setId(cursor.getInt(cursor.getColumnIndex("_id")));
+	 * info.setFileName(cursor.getString(cursor.getColumnIndex("fileName")));
+	 * info.setFileHead(cursor.getString(cursor.getColumnIndex("fileheader")));
+	 * info.setFileSize(cursor.getInt(cursor.getColumnIndex("filesize")));
+	 * info.setFileTitle(cursor.getString(cursor.getColumnIndex("fileTitle")));
+	 * info.setFileNo(cursor.getString(cursor.getColumnIndex("fileNo")));
+	 * info.setSetYear(cursor.getString(cursor.getColumnIndex("setYear")));
+	 * info.setAddTime(cursor.getLong(cursor.getColumnIndex("add_time")));
+	 * list.add(info); } } cursor.close(); return list; }
+	 */
+
+	/**
+	 * 关闭数据库
+	 */
+	public void closeDatabase() {
+		if (database != null) {
+			database.close();
+			database = null;
+		}
+	}
+
+}

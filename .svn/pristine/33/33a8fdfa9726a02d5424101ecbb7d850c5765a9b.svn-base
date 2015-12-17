@@ -1,0 +1,294 @@
+package com.zet.activity;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+
+import Decoder.BASE64Decoder;
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
+
+import com.bdkj.bdlibrary.utils.DialogUtils;
+import com.bdkj.bdlibrary.utils.KeyBoardUtils;
+import com.bdkj.bdlibrary.utils.StorageUtils;
+import com.bdkj.bdlibrary.utils.ToastUtils;
+import com.bdkj.bdlibrary.view.LoadingDialog;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.event.OnClick;
+import com.lidroid.xutils.utils.LogUtils;
+import com.zet.BaseActivity;
+import com.zet.Constants;
+import com.zet.R;
+import com.zet.adapter.EmailDetailAdapter;
+import com.zet.db.SQLiteUtils;
+import com.zet.email.CallOtherOpeanFile;
+import com.zet.model.ReciveOneMailDB;
+import com.zet.parser.ATTACH;
+import com.zet.parser.DETAIL;
+import com.zet.parser.RSSFeed;
+import com.zet.parser.RSSHandler2;
+import com.zet.pull.PullableListView;
+
+@ContentView(R.layout.activity_email_detail)
+public class EmailDetailActivity extends BaseActivity {
+	/*
+	 * Html.fromHtml("<font color='#333333'>" + "纳税人名称</font>")
+	 */
+	@ViewInject(R.id.tv_title)
+	private TextView tv_title;// 标题
+	@ViewInject(R.id.sjx_yj_fjr)
+	private TextView sjx_yj_fjr;// 发件人
+	@ViewInject(R.id.sjx_yj_sjr)
+	private TextView sjx_yj_sjr;// 收件人
+	@ViewInject(R.id.sjx_yj_cs)
+	private TextView sjx_yj_cs;// 抄送
+	@ViewInject(R.id.sjx_yj_fssj)
+	private TextView sjx_yj_fssj;// 发送时间
+	@ViewInject(R.id.lv_content_view)
+	private PullableListView listView;// 附件内容
+	@ViewInject(R.id.email_detail_mattachs)
+	private LinearLayout email_detail_mattachs;// 附件中的附件
+	@ViewInject(R.id.sjx_layout_006)
+	private LinearLayout sjx_layout_006;
+
+	private ReciveOneMailDB mReciveOneMailDB;
+	public RSSFeed feed;
+
+	private List<DETAIL> mDetails = new ArrayList<DETAIL>();
+	private List<ATTACH> mAttachs = new ArrayList<ATTACH>();
+
+	private EmailDetailAdapter adapter;
+	private String path;
+
+	@SuppressLint("SetJavaScriptEnabled")
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		mReciveOneMailDB = (ReciveOneMailDB) (savedInstanceState != null ? savedInstanceState
+				.getSerializable("mReciveOneMail") : getIntent()
+				.getSerializableExtra("mReciveOneMail"));
+		if (mReciveOneMailDB == null) {
+			finish();
+		}
+		sjx_layout_006.setVisibility(View.GONE);
+		String mSubject = TextUtils.isEmpty(mReciveOneMailDB.getSubject()) ? ""
+				: mReciveOneMailDB.getSubject();
+		String mFrom = TextUtils.isEmpty(mReciveOneMailDB.getForm()) ? ""
+				: mReciveOneMailDB.getForm();
+		String mTo = TextUtils.isEmpty(mReciveOneMailDB.getTopeople()) ? ""
+				: mReciveOneMailDB.getTopeople();
+		String mCC = TextUtils.isEmpty(mReciveOneMailDB.getCcpeople()) ? ""
+				: mReciveOneMailDB.getCcpeople();
+		String mTime = TextUtils.isEmpty(mReciveOneMailDB.getSentDate()) ? ""
+				: mReciveOneMailDB.getSentDate();
+		String mContent = TextUtils.isEmpty(mReciveOneMailDB.getBodycontent()) ? ""
+				: mReciveOneMailDB.getBodycontent();
+		tv_title.setText(mSubject);
+		sjx_yj_fjr.setText(mFrom);
+		sjx_yj_sjr.setText(mTo);
+		if (TextUtils.isEmpty(mCC)) {
+			findViewById(R.id.lyout_caosong).setVisibility(View.GONE);
+		} else
+			sjx_yj_cs.setText(mCC);
+		sjx_yj_fssj.setText(mTime);
+
+		listView.setCanPullUp(false);
+		listView.setCanPullDown(false);
+		adapter = new EmailDetailAdapter(EmailDetailActivity.this, mDetails);
+		listView.setAdapter(adapter);
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				path = StorageUtils.getStorageFile().toString()
+						+ Constants.ROOT_DIRECTION + "/tmp";
+				String AppfileName = mReciveOneMailDB.getAppfileName();
+				feed = readFile(path + "/" + AppfileName);
+				mHandler.sendEmptyMessage(0);
+			}
+		}).start();
+	}
+
+	Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			if (feed != null) {
+				LogUtils.d("读取成功：" + feed.toString());
+				mDetails = feed.getAllDETAILItems();
+				if (mDetails.size() > 0) {
+					adapter.changeData(mDetails);
+					adapter.notifyDataSetChanged();
+				}
+				int mAttachsItemCount = feed.getmAttachsItemCount();
+				if (mAttachsItemCount > 0) {
+					sjx_layout_006.setVisibility(View.VISIBLE);
+					mAttachs = feed.getAllATTACHItems();
+					addmAttachs();
+				} else {
+					sjx_layout_006.setVisibility(View.GONE);
+				}
+			}
+		}
+
+	};
+
+	private boolean decodingAttachs(int location) {
+		String mFILE_BIN = mAttachs.get(location).getFILE_BIN();
+		String fileName = mAttachs.get(location).getATTACH_ID();
+		if (TextUtils.isEmpty(fileName)) {
+			fileName = "" + System.currentTimeMillis();
+			mAttachs.get(location).setATTACH_ID(fileName);
+		}
+		String fileType = mAttachs.get(location).getFILE_TYPE();
+		if (!TextUtils.isEmpty(mFILE_BIN) && !TextUtils.isEmpty(fileType)) {
+
+			StringBuilder pictureBuffer = new StringBuilder(mFILE_BIN);
+			BASE64Decoder decoder = new BASE64Decoder();
+			FileOutputStream write;
+			try {
+				File storefile = new File(path + "/" + fileName + "."
+						+ fileType);
+				if (storefile.exists()) {
+					storefile.delete();
+				}
+				storefile.createNewFile();// 新建文件
+				write = new FileOutputStream(storefile);
+				byte[] decoderBytes = decoder.decodeBuffer(pictureBuffer
+						.toString());
+				write.write(decoderBytes);
+				return true;
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+
+		}
+		return false;
+	}
+
+	private void addmAttachs() {
+		LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
+		for (int i = 0; i < mAttachs.size(); i++) {
+			String name = mAttachs.get(i).getFILE_NAME();
+			final String fileType = mAttachs.get(i).getFILE_TYPE();
+			final String fileName = mAttachs.get(i).getATTACH_ID();
+			boolean haveAttatch = decodingAttachs(i);
+			if (haveAttatch) {
+				TextView textView = new TextView(EmailDetailActivity.this);
+				textView.setTextSize(16);
+				textView.setTextColor(getResources().getColor(
+						android.R.color.holo_red_light));
+				textView.setText(TextUtils.isEmpty(name) ? "" : name);
+				textView.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						try {
+							File myFile = new File(path, fileName + "."
+									+ fileType);
+							String string = myFile.getAbsolutePath();
+							if (string.endsWith(".rar")) {
+							} else if (string.endsWith(".apk")) {
+								return;
+							} else {
+								CallOtherOpeanFile.openFile(mContext, myFile);
+							}
+							// Intent intent = new Intent();
+							// intent.setAction(Intent.ACTION_VIEW);
+							// Uri content_url = Uri.parse(url);
+							// intent.setType("");
+							// intent.setData(content_url);
+							// EmailDetailActivity.this.startActivity(intent);
+						} catch (Exception e) {
+							// TODO: handle exception
+							e.printStackTrace();
+						}
+					}
+				});
+				email_detail_mattachs.addView(textView, layoutParams);
+			}
+		}
+	}
+
+	/**
+	 * 02. * 读取文件内容 03. * 04. * @param filePathAndName 05. * String 如 c:\\1.txt
+	 * 绝对路径 06. * @return boolean 07.
+	 */
+	public static RSSFeed readFile(String filePathAndName) {
+		// String fileContent = "";
+		try {
+			File f = new File(filePathAndName);
+
+			if (f.isFile() && f.exists()) {
+				FileInputStream fis = new FileInputStream(f);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser parser = factory.newSAXParser();
+				XMLReader reader = parser.getXMLReader();
+				RSSHandler2 handler = new RSSHandler2();
+				reader.setContentHandler(handler);
+				InputSource is = new InputSource(fis);// 取得本地xml文件
+				reader.parse(is);
+				return handler.getFeed();
+			}
+		} catch (Exception e) {
+			System.out.println("读取文件内容操作出错");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@OnClick({ R.id.tv_back, R.id.tv_delete })
+	public void onClick(View v) {
+		KeyBoardUtils.hideKeyBoard(this);
+		switch (v.getId()) {
+		case R.id.tv_back:
+			finish();
+			break;
+		case R.id.tv_delete:
+			DialogUtils.showAlertDialog(mContext, "删除邮件", "确定要删除该邮件吗？", "确定",
+					"取消", new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							ToastUtils.show(mContext, "已删除该邮件");
+							int index = SQLiteUtils.getInstance(mContext)
+									.emailUpdate(mReciveOneMailDB.getUserid(),
+											"emailVisual");
+							LogUtils.d("index = " + index);
+							if (index > 0) {
+								setResult(RESULT_OK);
+								finish();
+							}
+						}
+					}, null, Gravity.LEFT | Gravity.CENTER_VERTICAL);
+			break;
+		}
+	}
+}

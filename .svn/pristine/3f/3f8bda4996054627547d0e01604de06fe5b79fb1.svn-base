@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.zet"
+          android:versionCode="13"
+          android:versionName="2.1">
+
+  <uses-sdk
+    android:minSdkVersion="11"
+    android:targetSdkVersion="21"/>
+
+
+  <supports-screens
+    android:anyDensity="true"
+    android:largeScreens="true"
+    android:normalScreens="true"
+    android:smallScreens="true">
+  </supports-screens>
+
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+  <!-- Required 自定义用来收发消息的相关权限 -->
+  <permission
+    android:name="com.zet.permission.JPUSH_MESSAGE"
+    android:protectionLevel="signature"/>
+
+  <!-- Required  一些系统要求的权限，如访问网络等 -->
+  <uses-permission android:name="com.zet.permission.JPUSH_MESSAGE"/>
+  <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+
+  <application
+    android:theme="@android:style/Theme.Light.NoTitleBar"
+    android:name="com.zet.ApplicationContext"
+    android:icon="@drawable/ic_launcher"
+    android:label="@string/app_name">
+    <activity
+      android:name=".activity.EmptyActivity"
+      android:screenOrientation="portrait"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar"
+      android:windowSoftInputMode="stateHidden">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
+    <activity
+      android:name="com.zet.activity.LoadingActivity"
+      android:screenOrientation="portrait"
+      android:windowSoftInputMode="stateHidden"
+      >
+    </activity>
+    <activity
+      android:name="com.zet.activity.LoginActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+    <activity
+      android:name="com.zet.activity.ModifyPassActivity"
+      android:theme="@style/style_modify_pass_dialog"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+    <activity
+      android:name="com.zet.activity.TypeActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait">
+    </activity>
+    <activity
+      android:name="com.zet.activity.SearchListActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+    <activity
+      android:name="com.zet.activity.InfoDetailActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+    <activity
+      android:name="com.zet.activity.DepartMentSelectActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+    <activity
+      android:name="com.zet.activity.LoginEmailActivity"
+      android:windowSoftInputMode="stateHidden"
+      android:screenOrientation="portrait"/>
+
+    <!-- Required SDK核心功能 -->
+    <activity
+      android:name="cn.jpush.android.ui.PushActivity"
+      android:configChanges="orientation|keyboardHidden"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar">
+      <intent-filter>
+        <action android:name="cn.jpush.android.ui.PushActivity"/>
+
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="com.zet"/>
+      </intent-filter>
+    </activity>
+
+    <!-- Required  SDK核心功能 -->
+    <service
+      android:name="cn.jpush.android.service.DownloadService"
+      android:enabled="true"
+      android:exported="false">
+    </service>
+
+    <!-- Required SDK 核心功能 -->
+    <service
+      android:name="cn.jpush.android.service.PushService"
+      android:enabled="true"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="cn.jpush.android.intent.REGISTER"/>
+        <action android:name="cn.jpush.android.intent.REPORT"/>
+        <action android:name="cn.jpush.android.intent.PushService"/>
+        <action android:name="cn.jpush.android.intent.PUSH_TIME"/>
+      </intent-filter>
+    </service>
+
+    <!-- Required SDK核心功能 -->
+    <receiver
+      android:name="cn.jpush.android.service.PushReceiver"
+      android:enabled="true">
+      <intent-filter android:priority="1000">
+        <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY"/>
+        <!-- Required  显示通知栏 -->
+        <category android:name="com.zet"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.USER_PRESENT"/>
+        <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+      </intent-filter>
+      <!-- Optional -->
+      <intent-filter>
+        <action android:name="android.intent.action.PACKAGE_ADDED"/>
+        <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+
+        <data android:scheme="package"/>
+      </intent-filter>
+    </receiver>
+
+    <!-- Required SDK核心功能 -->
+    <receiver android:name="cn.jpush.android.service.AlarmReceiver"/>
+
+    <!-- User defined.    用户自定义的广播接收器 -->
+    <!--
+    <receiver
+        android:name="您自己定义的Receiver"
+        android:enabled="true">
+        <intent-filter>
+            <action android:name="cn.jpush.android.intent.REGISTRATION" /> Required  用户注册SDK的intent
+            <action android:name="cn.jpush.android.intent.UNREGISTRATION" />
+            <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" /> Required  用户接收SDK消息的intent
+            <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" /> Required  用户接收SDK通知栏信息的intent
+            <action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" /> Required  用户打开自定义通知栏的intent
+            <action android:name="cn.jpush.android.intent.CONNECTION" />接收网络变化 连接/断开 since 1.6.3
+            <category android:name="com.zet" />
+        </intent-filter>
+    </receiver>
+    -->
+
+
+    <!-- Required  . Enable it you can get statistics data with channel -->
+    <meta-data
+      android:name="JPUSH_CHANNEL"
+      android:value="developer-default"/>
+    <meta-data
+      android:name="JPUSH_APPKEY"
+      android:value="cbb064df8021f1dbcaf90f34"/>
+
+  </application>
+</manifest>

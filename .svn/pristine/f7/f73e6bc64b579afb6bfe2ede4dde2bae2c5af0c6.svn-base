@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="3" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="@drawable/second_image_parting_line"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:weightSum="2" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="105dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="horizontal" >
+
+            <!--
+                 <TextView
+                android:id="@+id/btn_type_7"
+                style="@style/style_type_button"
+                android:layout_width="135dp"
+                android:layout_height="135dp"
+                android:background="@drawable/img_menu_item_7_new"
+                android:gravity="left|bottom"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="10dp"
+                android:text="@string/activity_type_item_07" />
+            -->
+
+            <TextView
+                android:id="@+id/btn_type_8"
+                style="@style/style_type_button"
+                android:layout_width="165dp"
+                android:layout_height="165dp"
+                android:background="@drawable/img_menu_item_8_new"
+                android:gravity="left|bottom"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="25dp"
+                android:textColor="@color/black"
+                android:text="@string/activity_type_item_08" />
+
+            <TextView
+                android:id="@+id/btn_type_9"
+                style="@style/style_type_button"
+                android:layout_width="165dp"
+                android:layout_height="165dp"
+                android:textColor="@color/black"
+                android:background="@drawable/img_menu_item_9_new"
+                android:gravity="left|bottom"
+                android:paddingBottom="10dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="15dp"
+                android:text="@string/activity_type_item_09" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="105dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="horizontal" >
+
+            <!--
+                 <TextView
+                android:id="@+id/btn_type_9"
+                style="@style/style_type_button"
+                android:layout_width="135dp"
+                android:layout_height="135dp"
+                android:background="@drawable/img_menu_item_9_new"
+                android:gravity="left|bottom"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="10dp"
+                android:text="@string/activity_type_item_09" />
+            -->
+
+            <TextView
+                android:id="@+id/btn_type_10"
+                style="@style/style_type_button"
+                android:layout_width="165dp"
+                android:layout_height="165dp"
+                android:background="@drawable/img_menu_item_0_new"
+                android:gravity="left|bottom"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="25dp"
+                android:textColor="@color/black"
+                android:text="@string/activity_type_item_10" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simple_gray"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/llt_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_main_top_right"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_main_back"
+            android:clickable="true"
+            android:paddingBottom="@dimen/activity_search_top_padding_top"
+            android:paddingLeft="@dimen/activity_search_top_padding"
+            android:paddingRight="@dimen/activity_search_top_padding"
+            android:paddingTop="@dimen/activity_search_top_padding_top"
+            android:text="@string/activity_search_back"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_mediumn_small" />
+
+        <View
+            android:layout_width="@dimen/dialog_line_width"
+            android:layout_height="match_parent"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:paddingBottom="@dimen/activity_search_top_padding_top"
+            android:paddingLeft="@dimen/activity_search_top_padding"
+            android:paddingRight="@dimen/activity_search_top_padding"
+            android:paddingTop="@dimen/activity_search_top_padding_top"
+            android:text="@string/activity_detail_collect"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_mediumn_small" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_sender_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_horizontal"
+        android:padding="@dimen/activity_detail_title_padding"
+        android:text="@string/activity_detail_collect"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_big" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_detail_padding_left_right"
+            android:paddingLeft="@dimen/activity_detail_padding_left_right"
+            android:paddingRight="@dimen/activity_detail_padding_left_right" >
+
+            <TextView
+                android:id="@+id/tv_time_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableRight="@drawable/ic_arrow"
+                android:ellipsize="end"
+                android:gravity="left|center_horizontal"
+                android:padding="@dimen/activity_detail_title_padding"
+                android:text="@string/activity_detail_collect"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_big" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

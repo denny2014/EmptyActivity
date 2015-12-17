@@ -1,0 +1,78 @@
+package com.zet.adapter;
+
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.utils.InjectUtils;
+import com.zet.R;
+import com.zet.model.DocInfo;
+
+import java.util.List;
+
+/**
+ * Created by macchen on 15/4/10.
+ */
+public class SearchResultAdapter extends BaseAdapter {
+
+    private List<DocInfo> list;
+
+    public SearchResultAdapter(List<DocInfo> list) {
+        this.list = list;
+    }
+
+    public List<DocInfo> getList(){
+        return list;
+    }
+
+
+    public void setList(List<DocInfo> list)
+    {
+        this.list = list;
+    }
+    @Override
+    public int getCount() {
+        return list == null ? 0 : list.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return list.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder = null;
+        DocInfo info = list.get(position);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_search_result, null);
+            holder = new ViewHolder();
+            InjectUtils.inject(holder, convertView);
+            convertView.setTag(holder);
+
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+        holder.tvName.setText(info.getTitle());
+        holder.tvYear.setText(info.getDocYear());
+        holder.tvName.setTextColor(info.isLook()?Color
+                .GRAY:Color
+                .BLACK);
+        return convertView;
+    }
+
+    public class ViewHolder {
+        @ViewInject(R.id.tvResultName)
+        public TextView tvName;
+        @ViewInject(R.id.tvResultYear)
+        TextView tvYear;
+    }
+}

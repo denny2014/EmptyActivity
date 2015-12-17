@@ -1,0 +1,165 @@
+package com.zet.net;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.view.View;
+import com.bdkj.bdlibrary.utils.DialogUtils;
+import com.bdkj.bdlibrary.utils.HttpUtils;
+import com.zet.R;
+
+public class INetProxy implements INetListener {
+    private INetListener listener;
+    private Context context;
+    protected ProgressDialog dialog;
+    private boolean isCancel;
+    private boolean isFinish = false;
+    private String msg = null;
+
+    public INetProxy(Context context, INetListener listener) {
+        this.listener = listener;
+        this.context = context;
+    }
+
+    public INetProxy(Context context, INetListener listener, boolean isFinish) {
+        this.listener = listener;
+        this.context = context;
+        this.isFinish = isFinish;
+    }
+
+    public INetProxy(Context context, INetListener listener, boolean isFinish,
+                     String message) {
+        this.listener = listener;
+        this.context = context;
+        this.isFinish = isFinish;
+        this.msg = message;
+    }
+
+    public INetProxy(Context context, INetListener listener, String message) {
+        this.listener = listener;
+        this.context = context;
+        this.msg = message;
+    }
+
+    @Override
+    public boolean success(String type, Object objects) {
+        // TODO Auto-generated method stub
+        if (isCancel)
+            return false;
+        boolean isIntercept = listener.success(type, objects);
+        if (isCancel)
+            return false;
+        return false;
+    }
+
+    @Override
+    public boolean failure(String type, Object objects) {
+        // TODO Auto-generated method stub
+        if (isCancel)
+            return false;
+        boolean deal = listener.failure(type, objects);
+        if (isCancel)
+            return false;
+        if (!deal) {
+            showFailDialog();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean dataFailure(String type, Object objects) {
+        // TODO Auto-generated method stub
+        if (isCancel)
+            return false;
+        boolean failure = listener.dataFailure(type, objects);
+        if (isCancel)
+            return false;
+        if (!failure) {
+            createErrorDialog((String) (((Object[]) objects)[1]));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean start(String type, Object objects) {
+        // TODO Auto-generated method stub
+        boolean isIntercept = listener.start(type, objects);
+        if (!isIntercept) {
+            dialog = DialogUtils.showLoading(context, msg != null ? msg
+                    : context.getString(R.string.dialog_loading), true);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setOnCancelListener(new OnCancelListener() {
+
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    // TODO Auto-generated method stub
+                    isCancel = true;
+                    HttpUtils.getClient().cancelRequests(context, true);
+                    if (isFinish) {
+                        ((Activity) context).finish();
+                    }
+                }
+            });
+            	dialog.show();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean cancel(String type, Object objects) {
+        // TODO Auto-generated method stub
+        listener.cancel(type, objects);
+        isCancel = true;
+        return false;
+    }
+
+    @Override
+    public boolean finish(String type, Object objects) {
+        // TODO Auto-generated method stub
+        if (isCancel)
+            return false;
+        if (listener.finish(type, objects)) {
+            return false;
+        }
+        if (isCancel)
+            return false;
+        if (dialog != null) {
+            dialog.dismiss();
+            dialog = null;
+        }
+        return false;
+    }
+
+    private void createErrorDialog(String msg) {
+        DialogUtils.showAlertNoTitle(context, msg, context.getString(R.string.dialog_sure), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFinish) {
+                    ((Activity) context).finish();
+                }
+            }
+        });
+    }
+
+    private void showFailDialog() {
+        DialogUtils.showAlertNoTitle(context, context.getString(R.string.dialog_loading_fail), context.getString(R.string.dialog_sure), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFinish) {
+                    ((Activity) context).finish();
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean progress(String type, Object objects) {
+        // TODO Auto-generated method stub
+        if (isCancel)
+            return false;
+        return listener.progress(type, objects);
+    }
+
+}

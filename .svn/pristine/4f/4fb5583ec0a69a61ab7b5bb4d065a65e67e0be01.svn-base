@@ -1,0 +1,10 @@
+package com.zet.activity;
+
+import com.lidroid.xutils.annotation.ContentView;
+import com.zet.BaseActivity;
+import com.zet.R;
+@ContentView(R.layout.activity_email_detail)
+public class EmailDetailActivity extends BaseActivity{
+
+	
+}

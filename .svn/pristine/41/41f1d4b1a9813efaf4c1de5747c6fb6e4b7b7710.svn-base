@@ -1,0 +1,909 @@
+package com.zet.activity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.MimeMessage;
+
+import android.R.bool;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bdkj.bdlibrary.utils.DialogUtils;
+import com.bdkj.bdlibrary.utils.FileUtils;
+import com.bdkj.bdlibrary.utils.HttpUtils;
+import com.bdkj.bdlibrary.utils.KeyBoardUtils;
+import com.bdkj.bdlibrary.utils.LConfigUtils;
+import com.bdkj.bdlibrary.utils.SerializeUtils;
+import com.bdkj.bdlibrary.utils.StorageUtils;
+import com.bdkj.bdlibrary.utils.ToastUtils;
+import com.jsong.android.library.api.NetParameters;
+import com.jsong.android.library.api.NetRequestInterface;
+import com.jsong.android.library.api.NetRequestInterfaceImp;
+import com.jsong.android.library.api.NetResponseListener;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.event.OnClick;
+import com.lidroid.xutils.utils.LogUtils;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
+import com.zet.ApplicationContext;
+import com.zet.BaseActivity;
+import com.zet.Constants;
+import com.zet.R;
+import com.zet.ZetParams;
+import com.zet.adapter.SearchResultAdapter;
+import com.zet.asyncHandler.DocHandler;
+import com.zet.db.SQLiteUtils;
+import com.zet.email.EmailSender;
+import com.zet.email.ReciveOneMail;
+import com.zet.model.DocInfo;
+import com.zet.model.NewsInBrief;
+import com.zet.model.ReciveOneMailDB;
+import com.zet.model.UserInfo;
+import com.zet.net.BaseNetHandler;
+import com.zet.net.HandlerFactory;
+import com.zet.net.INetProxy;
+import com.zet.pull.PullToRefreshLayout;
+import com.zet.pull.PullableListView;
+import com.zet.utils.InterfaceConst;
+import com.zet.utils.ParseJsonUtil;
+import com.zet.utils.PdfUtils;
+
+/**
+ * 搜索列表界面 Created by macchen on 15/4/3.
+ */
+@ContentView(R.layout.activity_search_list)
+public class SearchListActivity extends BaseActivity implements
+		AdapterView.OnItemClickListener {
+	private Message message[] = null;
+	private ReciveOneMail pmm = null;
+	private String docType = null;
+	@ViewInject(R.id.lv_content_view)
+	PullableListView listView;
+	@ViewInject(R.id.tv_department)
+	TextView tvDepartment;
+	@ViewInject(R.id.tv_serarch_year)
+	TextView tvYear;
+	@ViewInject(R.id.iv_collect)
+	ImageView iv_collect;
+	@ViewInject(R.id.et_search_number)
+	EditText etNumber;
+	@ViewInject(R.id.refresh_view)
+	PullToRefreshLayout layout;
+	@ViewInject(R.id.etKey)
+	EditText etKey;
+	@ViewInject(R.id.list_search_layout)
+	RelativeLayout searchLayout;;
+	@ViewInject(R.id.list_title_layout)
+	LinearLayout titleLayout;;
+
+	private static final int GETEMAILRROMDB = 0x01;
+	private static final int GETEMAILRROMWEB = 0x02;
+	private static final int DISMISS = 0x03;
+	/**
+	 * 部门请求
+	 */
+	private final int DEPART_REQUEST = 1;
+
+	private final int EMAIL_DELETE = 3;
+	/**
+	 * 年代请求
+	 */
+	private final int YEAR_REQUEST = 2;
+
+	/**
+	 * 每页的条数
+	 */
+	private int pagesize = 50;
+	private int pagesizeNew = 20;
+	/**
+	 * 页码
+	 */
+	private int page = 1;
+	private boolean reload = true;
+	private String departCode = "";
+	private String mDepartName = "";
+	private String year = "";
+	/**
+	 * 搜索的关键词
+	 */
+	private String keyWord = "";
+
+	/**
+	 * 文号
+	 */
+	private String number = "";
+
+	/**
+	 * 是否是线上数据（表示线上,0表示本地)
+	 */
+	private int online = 1;// 线上
+
+	private SearchResultAdapter adapter;
+
+	private UserInfo userInfo;
+
+	/**
+	 * 当前是否显示的是收藏的数据
+	 */
+	private boolean isCollect = false;
+
+	SharedPreferences emailSetting;
+	static String emailUsername;
+	static String emailPssword;
+
+	/**
+	 * 收藏切换时缓存下来的数据
+	 */
+	private List<Object> cacheData = new ArrayList<Object>();
+	protected ProgressDialog dialog;
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			docType = savedInstanceState.getString("docType");
+		} else {
+			docType = getIntent().getStringExtra("docType");
+		}
+		if (docType == null)
+			finish();
+		layout.setOnRefreshListener(new MyListener());
+		Object object = SerializeUtils.readObject(new File(getCacheDir(),
+				"user.info"));
+		if (docType.equals("06") || docType == "06") {
+			// 邮件系统
+			getEmailConfig();
+			searchLayout.setVisibility(View.GONE);
+			iv_collect.setVisibility(View.GONE);
+			try {
+				dialog = DialogUtils.showLoading(mContext,
+						mContext.getString(R.string.dialog_loading), true);
+				dialog.setCanceledOnTouchOutside(false);
+				mHandler.sendEmptyMessage(GETEMAILRROMDB);
+				refuseGetNewEmail();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (docType.equals("05") || docType == "05") {
+			// 财经政策简讯
+			LogUtils.i("财经政策简讯");
+			dialog = DialogUtils.showLoading(mContext,
+					mContext.getString(R.string.dialog_loading), true);
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.show();
+			if (object != null) {
+				AskTaskLoad(12);
+			} else {
+				listView.setCanPullUp(false);
+				listView.setCanPullDown(false);
+			}
+		} else {
+			if (object != null) {
+				userInfo = (UserInfo) object;
+				HttpUtils.get(mContext, Constants.SERVER_URL, ZetParams
+						.getSearchList(keyWord, userInfo.getAdmdivCode(),
+								userInfo.getDivCode(), departCode, number,
+								year, userInfo.getUserId(), docType, pagesize
+										+ "", ((page - 1) * pagesize) + "",
+								online + ""), HandlerFactory.getHandler(
+						DocHandler.class, new BaseNetHandler(new INetProxy(
+								mContext, this), Constants.SEARCH_ACTION)));
+			} else {
+				listView.setCanPullUp(false);
+				listView.setCanPullDown(false);
+			}
+		}
+		listView.setOnItemClickListener(this);
+		adapter = new SearchResultAdapter(new ArrayList<DocInfo>());
+		listView.setAdapter(adapter);
+	}
+
+	private void refuseGetNewEmail() {
+		if (dialog != null) {
+			dialog.show();
+		}else {
+			dialog =DialogUtils.showLoading(mContext,
+					mContext.getString(R.string.dialog_loading), true);
+			dialog.show();
+		}
+		page = 1;
+		final boolean isFirstLogin = emailSetting.getBoolean(InterfaceConst.isFirstLogin, false);
+		saveEmailMessage();
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					do {
+						receiverEmail();
+					} while (reload);
+					if(isFirstLogin){
+						mHandler.sendEmptyMessage(DISMISS);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mHandler.sendEmptyMessage(DISMISS);
+				}
+			}
+		}).start();
+	}
+
+	private void AskTaskLoad(int tag) {
+		// TODO Auto-generated method stub
+		NetParameters parameters = new com.jsong.android.library.api.NetParameters();
+		parameters.addParam(NetRequestInterface.REQUESTYPE,
+				NetRequestInterface.REQUESTBYGET);
+		parameters.addParam("url", Constants.SERVER_URL);
+		parameters.addParam("action", "getmess");
+		String dpartName = TextUtils.isEmpty(mDepartName) ? "" : mDepartName;
+		if (!TextUtils.isEmpty(dpartName) && dpartName.equals("所有部门")) {
+			dpartName = "";
+		}
+		parameters.addParam("depname", dpartName);
+		parameters.addParam("fileno", TextUtils.isEmpty(number) ? "" : number);// fileNO1
+		String mYear = TextUtils.isEmpty(year) ? "" : year;
+		if (!TextUtils.isEmpty(mYear) && mYear.equals("所有年度")) {
+			mYear = "";
+		}
+		parameters.addParam("setyear", TextUtils.isEmpty(mYear) ? "" : mYear);// sdocyear1
+		parameters.addParam("eyword", TextUtils.isEmpty(etKey.getText()
+				.toString()) ? "" : (etKey.getText().toString()));
+		parameters.addParam("rows", pagesizeNew + "");//
+		parameters.addParam("debug", Constants.PARAMS_DEBUG_VALUE);
+		parameters.addParam("start", ((page - 1) * pagesizeNew) + "");
+
+		new NetRequestInterfaceImp().dorequest(parameters,
+				new NetResponseListener() {
+					@Override
+					public void onException(Exception e, int tag) {
+						ToastUtils.show(mContext, "网络不佳");
+						if (dialog != null && dialog.isShowing()) {
+							dialog.dismiss();
+						}
+						ParseJsonUtil.getInstance().showFailDialog(mContext);
+					}
+
+					@Override
+					public void onComplete(Object object, int tag) {
+						if (ParseJsonUtil.getInstance().parseIsSuccess(
+								object.toString())) {
+							List<NewsInBrief> list = ParseJsonUtil
+									.getInstance().parseNewsInBriefMessage(
+											object.toString());
+							LogUtils.e(list.toString());
+							if (page == 1) {
+								layout.refreshFinish(PullToRefreshLayout.SUCCEED);
+								adapter.getList().clear();
+							} else {
+								layout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+							}
+							adapter.getList().addAll(list);
+							adapter.notifyDataSetChanged();
+							listView.setSelection(pagesize * (page - 1));
+							listView.setCanPullUp(list.size() >= pagesize);
+							// if (list.size() < pagesize) {
+							// ToastUtils.show(mContext,
+							// R.string.activity_search_not_data);
+							// }
+							isCollect = false;
+						} else {
+							String errorMessage = ParseJsonUtil.getInstance()
+									.getErrorMessage(object.toString());
+							if (TextUtils.isEmpty(errorMessage)) {
+								ParseJsonUtil.getInstance().showFailDialog(
+										mContext);
+							} else {
+								ParseJsonUtil.getInstance().createErrorDialog(
+										mContext, errorMessage);
+							}
+						}
+						if (dialog != null && dialog.isShowing()) {
+							dialog.dismiss();
+						}
+					}
+				}, mContext, tag);
+	}
+
+	private void getEmailConfig() {
+		emailSetting = LConfigUtils.getPreferences(this,
+				InterfaceConst.emailSetting);
+		emailUsername = emailSetting.getString(InterfaceConst.emailname, "");
+		emailPssword = emailSetting.getString(InterfaceConst.emailpassword, "");
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("docType", docType);
+	}
+
+	public void receiverEmail() {
+		String[] emailUsernames = emailUsername.split("@");
+		Properties props = System.getProperties();
+		Session session = null;
+		URLName urln = null;
+		Store store = null;
+		try {
+			if (emailUsername.contains("@126")) {
+				props.put("mail.smtp.host", "smtp.126.com");
+				props.put("mail.smtp.post", 25);
+				props.put("mail.smtp.auth", true);
+				session = Session.getDefaultInstance(props, null);
+				urln = new URLName("pop3", "pop3.126.com", 110, null,
+						emailUsernames[0], emailPssword);
+				store = session.getStore(urln);
+
+				store.connect();
+			} else if (emailUsername.contains("@qq")
+					|| emailUsername.contains("@QQ")) {
+				String host = "imap.qq.com";
+				String port = "143";
+				props.setProperty("mail.imap.socketFactory.port", port);
+				props.setProperty("mail.imap.partialfetch", "false");
+				props.setProperty("mail.store.protocol", "imap");
+				props.setProperty("mail.imap.host", host);
+				props.setProperty("mail.imap.port", port);
+				props.setProperty("mail.imap.auth.login.disable", "true");
+				props.setProperty("mail.mime.base64.ignoreerrors", "true");
+				session = Session.getDefaultInstance(props, null);
+				session.setDebug(false);
+				store = session.getStore("imap");
+				store.connect(host, emailUsernames[0], emailPssword);
+			}
+			Folder folder = store.getFolder("INBOX");
+			folder.open(Folder.READ_ONLY);
+			// List<ReciveOneMailDB> list = new ArrayList<ReciveOneMailDB>();
+			reload = false;
+			if (folder instanceof IMAPFolder) {
+				IMAPFolder inbox = (IMAPFolder) folder;
+				message = inbox.getMessages();
+				for (int i = 0; i < message.length; i++) {
+					MimeMessage mimeMessage = (MimeMessage) message[i];
+					pmm = new ReciveOneMail((MimeMessage) message[i]);
+					String uid = Long.toString(inbox.getUID(mimeMessage));
+					if (!SQLiteUtils.getInstance(mContext).emailIsExist(uid,
+							emailUsername)) {
+						// 获得邮件内容
+						IMAPMessage msg = (IMAPMessage) message[i];
+						String contentype = pmm.getFrom();
+						LogUtils.d("contentype : " + contentype);
+						if (!TextUtils.isEmpty(contentype)
+								&& (contentype.contains("PostMaster") || contentype
+										.contains("postmaster"))) {
+							MimeMessage cmsg = new MimeMessage(
+									(MimeMessage) msg);
+							LogUtils.d("QQ_MAIL_RETURN=======cmsg.getContent() : "
+									+ cmsg.getContent().toString());
+						} else {
+							Object object = msg.getContent();
+							if (object instanceof String) {
+								LogUtils.d("=======object.toString() : "
+										+ object.toString());
+							} else {
+								if (pmm.isContainAttach((Part) message[i])) {
+									LogUtils.d("IMAPFolder fileName "
+											+ pmm.getappfileName1(uid));
+									if (pmm.getappfileName1(uid).contains(".xml")) {
+										new SavaAttachAndDBAsync().execute(pmm,
+												uid, message[i]);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void saveToDataBaseAndList(ReciveOneMail pmm, String uid,
+			Message message) throws Exception {
+		pmm.setAttachPath(StorageUtils.getStorageFile().toString()
+				+ Constants.ROOT_DIRECTION);
+		pmm.saveAttachMent(message, uid,mContext,emailUsername);
+		pmm.getMailContent((Part) message);
+		pmm.setDateFormat("yyyy年MM月dd日 HH:mm");
+//		respondToEmail(pmm.getFrom(), pmm.getSubject());
+		SQLiteUtils.getInstance(mContext).addEmailToDB(pmm,
+				pmm.isContainAttach((Part) message), uid, emailUsername,
+				pmm.getappfileName(uid));
+	}
+
+	Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case DISMISS:
+				if (dialog != null && dialog.isShowing()) {
+					dialog.dismiss();
+				}
+				layout.refreshFinish(PullToRefreshLayout.SUCCEED);
+				break;
+			case GETEMAILRROMDB:
+				List<ReciveOneMailDB> listDB = SQLiteUtils
+						.getInstance(mContext).getEmailFromDb(
+								((page - 1) * pagesizeNew),
+								(page * pagesizeNew) - page + 1, emailUsername,
+								etKey.getText().toString(), emailUsername);
+				Log.i("DreamlistDB", "" + listDB.size());
+				adapter.getList().addAll(listDB);
+				adapter.notifyDataSetChanged();
+				isCollect = false;
+				break;
+			case GETEMAILRROMWEB:
+				List<ReciveOneMailDB> list = SQLiteUtils.getInstance(mContext)
+						.getEmailFromDb(((page - 1) * pagesizeNew),
+								(page * pagesizeNew) - page + 1, emailUsername,
+								etKey.getText().toString(), emailUsername);
+				Log.i("Dream", "" + list.size());
+				layout.refreshFinish(PullToRefreshLayout.SUCCEED);
+				adapter.getList().clear();
+				adapter.addList(list);
+				adapter.notifyDataSetChanged();
+				listView.setSelection(pagesize * (page - 1));
+				listView.setCanPullUp(list.size() >= pagesizeNew);
+				isCollect = false;
+				if (dialog != null && dialog.isShowing()) {
+					dialog.dismiss();
+				}
+				break;
+
+			}
+		};
+	};
+
+	/**
+	 * 重新加载
+	 */
+	public void reload() {
+		page = 1;
+		adapter.getList().clear();
+		adapter.notifyDataSetChanged();
+		listView.setCanPullDown(true);
+		LogUtils.e("---"
+				+ Constants.SERVER_URL
+				+ ZetParams.getSearchList(keyWord, userInfo.getAdmdivCode(),
+						userInfo.getDivCode(), departCode, number, year,
+						userInfo.getUserId(), docType, pagesize + "",
+						((page - 1) * pagesize) + "", online + "").toString());
+		HttpUtils.get(mContext, Constants.SERVER_URL, ZetParams.getSearchList(
+				keyWord, userInfo.getAdmdivCode(), userInfo.getDivCode(),
+				departCode, number, year, userInfo.getUserId(), docType,
+				pagesize + "", ((page - 1) * pagesize) + "", online + ""),
+				HandlerFactory.getHandler(DocHandler.class, new BaseNetHandler(
+						new INetProxy(mContext, SearchListActivity.this),
+						Constants.SEARCH_ACTION)));
+	}
+
+	@OnClick({ R.id.iv_collect, R.id.iv_help, R.id.tv_back, R.id.btn_search,
+			R.id.tv_department, R.id.tv_serarch_year, R.id.iv_goto_top,
+			R.id.btn_search })
+	public void onClick(View v) {
+		KeyBoardUtils.hideKeyBoard(this);
+		switch (v.getId()) {
+		case R.id.iv_collect:
+			if (isCollect)
+				return;
+			if (docType.equals("06") || docType == "06") {
+				// 邮件处理
+				ToastUtils.show(mContext, "邮件收藏");
+			} else if (docType.equals("05") || docType == "05") {
+				Toast.makeText(mContext, " 简讯收藏", Toast.LENGTH_LONG).show();
+			} else {
+				List<DocInfo> list = SQLiteUtils.getInstance(mContext)
+						.getCollect();
+				cacheData = adapter.getList();
+				adapter.setList(list);
+				listView.setCanPullUp(false);
+				listView.setCanPullDown(false);
+				adapter.notifyDataSetChanged();
+				isCollect = true;
+			}
+			break;
+		case R.id.iv_help:
+			if (!StorageUtils.isMount()) {
+				ToastUtils.showWarn(mContext,
+						R.string.activity_sdcard_not_mount);
+			} else {
+				File file = new File(StorageUtils.getStorageFile(),
+						Constants.ROOT_DIRECTION + "/userGuide.pdf");
+				if (!file.exists()) {
+					boolean success = false;
+					FileUtils.createFolder(file.getParentFile());
+					FileUtils.createFile(file);
+					InputStream stream = null;
+					try {
+						stream = mContext.getAssets().open("userGuide.pdf");
+						FileUtils.writeFile(file, stream);
+						success = true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						if (stream != null) {
+							try {
+								stream.close();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					if (success) {
+						PdfUtils.openPDF(mContext, file.getAbsolutePath());
+					} else {
+						ToastUtils.showError(mContext, R.string.open_pdf_fail);
+						FileUtils.deleteFile(file);
+					}
+				} else {
+					PdfUtils.openPDF(mContext, file.getAbsolutePath());
+				}
+			}
+			break;
+		case R.id.tv_back:
+			if (isCollect) {
+				adapter.setList(cacheData);
+				adapter.notifyDataSetChanged();
+				listView.setCanPullDown(true);
+				listView.setCanPullUp(true);
+				isCollect = false;
+			} else {
+				finish();
+			}
+			break;
+		case R.id.tv_department:
+			Bundle departBunld = new Bundle();
+			departBunld.putInt("selectItem", 0);
+			ApplicationContext
+					.showSelect(mContext, departBunld, DEPART_REQUEST);
+			break;
+		case R.id.tv_serarch_year:
+			Bundle yearBunld = new Bundle();
+			yearBunld.putInt("selectItem", 1);
+			ApplicationContext.showSelect(mContext, yearBunld, YEAR_REQUEST);
+			break;
+		case R.id.iv_goto_top:
+			listView.setSelection(0);
+			break;
+		case R.id.btn_search:
+			String snumber = etNumber.getText().toString();
+			String skeyword = etKey.getText().toString();
+			KeyBoardUtils.hideKeyBoard(SearchListActivity.this);
+			keyWord = skeyword;
+			number = snumber;
+			if (docType.equals("06") || docType == "06") {
+				// 邮件处理
+				EmaildoRefresh(true, keyWord);
+			} else if (docType.equals("05") || docType == "05") {
+				ToastUtils.show(mContext, "简讯搜索");
+				NewsInBriefdoRefresh(true);
+			} else {
+				if (userInfo != null) {
+					reload();
+				}
+			}
+			break;
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
+			case EMAIL_DELETE:
+				LogUtils.d("EMAIL_DELETE");
+//				reload = true;
+//				refuseGetNewEmail();
+				page = 1;
+				mHandler.sendEmptyMessage(GETEMAILRROMWEB);
+				break;
+			case DEPART_REQUEST:
+				String departName = data.getStringExtra("depart_name");
+				String redepartCode = data.getStringExtra("depart_code");
+				tvDepartment.setText(departName);
+				mDepartName = departName;
+				departCode = redepartCode;
+				if (docType.equals("05") || docType == "05") {
+					ToastUtils.show(mContext, "简讯搜索");
+					NewsInBriefdoRefresh(true);
+				} else {
+					if (userInfo != null) {
+						reload();
+					}
+				}
+				break;
+			case YEAR_REQUEST:
+				String mYear = data.getStringExtra("year");
+				if (getString(R.string.activity_search_all_year).equals(mYear)) {
+					year = "";
+				} else {
+					year = mYear;
+				}
+				tvYear.setText(mYear);
+				if (docType.equals("05") || docType == "05") {
+					ToastUtils.show(mContext, "简讯搜索");
+					NewsInBriefdoRefresh(true);
+				} else {
+					if (userInfo != null) {
+						reload();
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	@Override
+	public boolean success(String type, Object objects) {
+		Object[] data = (Object[]) objects;
+		if (type.equals(Constants.SEARCH_ACTION)) {
+			List<DocInfo> list = (List<DocInfo>) data[1];
+			if (page == 1) {
+				layout.refreshFinish(PullToRefreshLayout.SUCCEED);
+				adapter.getList().clear();
+			} else {
+				layout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+			}
+			adapter.getList().addAll(list);
+			adapter.notifyDataSetChanged();
+			listView.setSelection(pagesize * (page - 1));
+			listView.setCanPullUp(list.size() >= pagesize);
+			isCollect = false;
+		}
+		return super.success(type, objects);
+	}
+
+	@Override
+	public boolean failure(String type, Object objects) {
+		if (page == 1) {
+			layout.refreshFinish(PullToRefreshLayout.FAIL);
+		} else {
+			layout.loadmoreFinish(PullToRefreshLayout.FAIL);
+		}
+		return super.failure(type, objects);
+	}
+
+	@Override
+	public boolean dataFailure(String type, Object objects) {
+		if (type.equals(Constants.SEARCH_ACTION)) {
+			if (page == 1) {
+				layout.refreshFinish(PullToRefreshLayout.FAIL);
+			} else {
+				layout.loadmoreFinish(PullToRefreshLayout.FAIL);
+			}
+
+		}
+		return super.dataFailure(type, objects);
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		if (docType.equals("06") || docType == "06") {
+			// 邮件处理
+			ReciveOneMailDB mReciveOneMail = (ReciveOneMailDB) adapter
+					.getItem(position);
+			Bundle mBundle = new Bundle();
+			mBundle.putString("emailUsername",emailUsername );
+			mBundle.putSerializable("mReciveOneMail", mReciveOneMail);
+			ApplicationContext.showEmailDetail(this, mBundle, EMAIL_DELETE);
+			SQLiteUtils.getInstance(mContext).emailUpdate(
+					mReciveOneMail.getUserid(), "hasRead");
+		} else if (docType.equals("05") || docType == "05") {
+			ToastUtils.show(mContext, "简讯详情");
+			NewsInBrief mNewsInBrief = (NewsInBrief) adapter.getItem(position);
+			Bundle mBundle = new Bundle();
+			mBundle.putString("docType", docType);
+			mBundle.putSerializable("docInfo", mNewsInBrief);
+			ApplicationContext.showDetail(this, mBundle);
+			mNewsInBrief.setIsLook(true);
+		} else {
+			DocInfo info = (DocInfo) adapter.getItem(position);
+			Bundle bundle = new Bundle();
+			bundle.putString("docType", docType);
+			bundle.putSerializable("docInfo", info);
+			ApplicationContext.showDetail(this, bundle);
+			info.setIsLook(true);
+			// adapter.notifyDataSetChanged();
+		}
+		SearchResultAdapter.ViewHolder holder = (SearchResultAdapter.ViewHolder) view
+				.getTag();
+		holder.tvName.setTextColor(Color.GRAY);
+
+	}
+
+	class MyListener implements PullToRefreshLayout.OnRefreshListener {
+
+		@Override
+		public void onRefresh(final PullToRefreshLayout pullToRefreshLayout) {
+			// 下拉刷新操作
+			if (docType.equals("06") || docType == "06") {
+				// 邮件处理
+				reload = true;
+				refuseGetNewEmail();
+			} else if (docType.equals("05") || docType == "05") {
+				Toast.makeText(mContext, " 简讯下拉刷新操作", Toast.LENGTH_LONG).show();
+				NewsInBriefdoRefresh(true);
+			} else {
+				doRefresh(true);
+			}
+		}
+
+		@Override
+		public void onLoadMore(final PullToRefreshLayout pullToRefreshLayout) {
+			// 加载操作
+			if (docType.equals("06") || docType == "06") {
+				// 邮件处理
+				Toast.makeText(mContext, "邮件处理加载操作", Toast.LENGTH_LONG).show();
+				EmaildoRefresh(false, "");
+			} else if (docType.equals("05") || docType == "05") {
+				Toast.makeText(mContext, " 简讯下拉刷新操作", Toast.LENGTH_LONG).show();
+				NewsInBriefdoRefresh(false);
+			} else {
+				doRefresh(false);
+			}
+		}
+
+	}
+
+	private void NewsInBriefdoRefresh(boolean isRefresh) {
+		// TODO Auto-generated method stub
+		if (isRefresh)
+			page = 1;
+		else
+			page++;
+		if (dialog != null) {
+			dialog.show();
+		}
+		AskTaskLoad(12);
+	}
+
+	private void EmaildoRefresh(boolean isRefresh, String keyWords) {
+		// TODO Auto-generated method stub
+		if (isRefresh)
+			page = 1;
+		else
+			page++;
+		if (dialog != null) {
+			dialog.show();
+		}
+		List<ReciveOneMailDB> list;
+		list = SQLiteUtils.getInstance(mContext).getEmailFromDb(
+				((page - 1) * pagesizeNew), (page * pagesizeNew) - page + 1,
+				emailUsername, keyWords, emailUsername);
+		layout.refreshFinish(PullToRefreshLayout.SUCCEED);
+		if (!TextUtils.isEmpty(keyWords)) {
+			adapter.getList().clear();
+			if (list.size() == 0) {
+				ToastUtils.show(mContext,
+						mContext.getString(R.string.serach_email_list));
+			}
+		}
+		adapter.addList(list);
+		adapter.notifyDataSetChanged();
+		listView.setSelection(pagesize * (page - 1));
+		listView.setCanPullUp(list.size() >= pagesizeNew);
+		isCollect = false;
+		dialog.dismiss();
+	}
+
+	public void doRefresh(boolean isRefresh) {
+		if (isRefresh)
+			page = 1;
+		else
+			page++;
+		if (userInfo != null) {
+			HttpUtils.get(mContext, Constants.SERVER_URL, ZetParams
+					.getSearchList(keyWord, userInfo.getAdmdivCode(),
+							userInfo.getDivCode(), departCode, number, year,
+							userInfo.getUserId(), docType, pagesize + "",
+							((page - 1) * pagesize) + "", online + ""),
+					HandlerFactory.getHandler(DocHandler.class,
+							new BaseNetHandler(this, Constants.SEARCH_ACTION)));
+		}
+	}
+
+//	private void respondToEmail(final String toAddress, final String mSubject) {
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				try {
+//					String newAddress = toAddress.substring(
+//							toAddress.indexOf("<") + 1,
+//							toAddress.lastIndexOf(">"));
+//					EmailSender sender = new EmailSender();
+//					// 设置服务器地址和端口
+//					sender.setProperties("smtp.qq.com", "25");
+//					// 分别设置发件人，邮件标题和文本内容
+//					sender.setMessage(emailUsername, "回复:" + mSubject, "邮件已收到~");
+//					// 设置收件人
+//					sender.setReceiver(new String[] { newAddress });
+//					// 添加附件
+//					// sender.addAttachment("/default.prop");
+//					// 发送邮件
+//					sender.sendEmail("smtp.qq.com", emailUsername, emailPssword);
+//				} catch (AddressException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (MessagingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		}).start();
+//	}
+
+	class SavaAttachAndDBAsync extends AsyncTask<Object, Object, Object> {
+		@Override
+		protected Object doInBackground(Object... params) {
+			// TODO Auto-generated method stub
+			try {
+				saveToDataBaseAndList((ReciveOneMail) params[0],
+						(String) params[1], (Message) params[2]);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		protected void onPostExecute(Object result) {
+			mHandler.sendEmptyMessage(GETEMAILRROMWEB);
+		};
+	};
+	private void saveEmailMessage() {
+		SharedPreferences.Editor editor = emailSetting.edit();
+		editor.putBoolean(InterfaceConst.isFirstLogin,true);
+		editor.commit();
+	}
+}

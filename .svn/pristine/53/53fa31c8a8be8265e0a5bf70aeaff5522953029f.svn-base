@@ -1,0 +1,110 @@
+package com.zet.adapter;
+
+import java.util.List;
+
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.utils.InjectUtils;
+import com.zet.R;
+import com.zet.model.DocInfo;
+import com.zet.model.NewsInBrief;
+import com.zet.model.ReciveOneMailDB;
+
+/**
+ * Created by macchen on 15/4/10.
+ */
+public class SearchResultAdapter extends BaseAdapter {
+
+	private List<Object> list;
+
+	public SearchResultAdapter(List<? extends Object> list) {
+		this.list = (List<Object>) list;
+	}
+
+	public List<Object> getList() {
+		return list;
+	}
+	
+	public void addList(List<? extends Object> lists) {
+		list.addAll(lists);
+	}
+
+	public void setList(List<? extends Object> list) {
+		this.list = (List<Object>) list;
+	}
+
+	@Override
+	public int getCount() {
+		return list == null ? 0 : list.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return list.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		Object object = list.get(position);
+		ViewHolder holder = null;
+		if (convertView == null) {
+			if (object instanceof ReciveOneMailDB) {
+				convertView = LayoutInflater.from(parent.getContext()).inflate(
+						R.layout.email_item_search_result, null);
+				
+			}else{
+				convertView = LayoutInflater.from(parent.getContext()).inflate(
+						R.layout.item_search_result, null);
+			}
+			holder = new ViewHolder();
+			InjectUtils.inject(holder, convertView);
+			convertView.setTag(holder);
+
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+		if (object instanceof DocInfo) {
+			DocInfo info = (DocInfo) object;
+			holder.tvName.setText(info.getTitle());
+			holder.tvYear.setText(info.getDocYear());
+			holder.tvName
+					.setTextColor(info.isLook() ? Color.GRAY : Color.BLACK);
+		} else if (object instanceof ReciveOneMailDB) {
+			ReciveOneMailDB mReciveOneMail = (ReciveOneMailDB) object;
+			try {
+				holder.tvName.setText(mReciveOneMail.getSubject());
+				holder.tvYear.setText(mReciveOneMail.getSentDate());
+				holder.tvName.setTextColor(mReciveOneMail.getHasRead().equals("true") ? Color.GRAY
+						: Color.BLACK);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(object instanceof  NewsInBrief){
+			NewsInBrief mNewsInBrief = (NewsInBrief) object;
+			holder.tvName.setText(mNewsInBrief.getTITLE());
+			holder.tvYear.setText(mNewsInBrief.getSET_YEAR());
+			holder.tvName
+					.setTextColor(mNewsInBrief.isLook() ? Color.GRAY : Color.BLACK);
+		}
+		return convertView;
+	}
+
+	public class ViewHolder {
+		@ViewInject(R.id.tvResultName)
+		public TextView tvName;
+		@ViewInject(R.id.tvResultYear)
+		TextView tvYear;
+	}
+}

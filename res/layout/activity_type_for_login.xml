@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="match_parent"
+  android:clipChildren="false"
+  android:gravity="center"
+  android:padding="@dimen/activity_type_padding"
+  android:background="@drawable/bg_type"
+  android:layout_height="match_parent">
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left"
+    android:visibility="gone"
+    >
+
+    <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/btn_back"
+      android:padding="@dimen/activity_type_padding"
+      android:id="@+id/btn_back"
+      />
+  </LinearLayout>
+  <LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_marginTop="@dimen/activity_type_item_spacing"
+    android:gravity="center"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:weightSum="2"
+      android:orientation="horizontal">
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:id="@+id/btn_type_1"
+        android:text="@string/activity_type_item_01_for_login"
+        style="@style/style_type_button_login"/>
+
+      <TextView
+        style="@style/style_type_button_login"
+        android:id="@+id/btn_type_2"
+        android:layout_width="0dp"
+        android:layout_marginLeft="@dimen/activity_type_item_spacing"
+        android:layout_weight="1"
+        android:text="@string/activity_type_item_02_for_login"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:weightSum="2"
+      android:layout_marginTop="@dimen/activity_type_item_spacing"
+      android:orientation="horizontal">
+
+      <TextView
+        android:layout_width="0dp"
+        android:id="@+id/btn_type_3"
+        android:layout_weight="1"
+        android:text="@string/activity_type_item_03_for_login"
+        style="@style/style_type_button_login"/>
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="@dimen/activity_type_item_spacing"
+        android:id="@+id/btn_type_4"
+        android:text="@string/activity_type_item_04_for_login"
+        android:layout_height="match_parent"
+        style="@style/style_type_button_login"/>
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:weightSum="2"
+      android:layout_marginTop="@dimen/activity_type_item_spacing"
+      android:clipChildren="false"
+      android:orientation="horizontal">
+
+      <TextView
+        style="@style/style_type_button_login"
+        android:id="@+id/btn_type_5"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:text="@string/activity_type_item_05_for_login"/>
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_marginLeft="@dimen/activity_type_item_spacing"
+        android:layout_weight="1"
+        android:visibility="invisible"
+        android:text="@string/activity_type_item_03_for_login"
+        style="@style/style_type_button_login"/>
+    </LinearLayout>
+  </LinearLayout>
+</LinearLayout>

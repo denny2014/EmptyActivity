@@ -1,0 +1,191 @@
+package com.zet.activity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.bdkj.bdlibrary.utils.HttpUtils;
+import com.bdkj.bdlibrary.utils.SerializeUtils;
+import com.lidroid.xutils.annotation.ContentView;
+import com.lidroid.xutils.annotation.ViewInject;
+import com.lidroid.xutils.event.OnClick;
+import com.lidroid.xutils.utils.LogUtils;
+import com.zet.BaseActivity;
+import com.zet.Constants;
+import com.zet.R;
+import com.zet.ZetParams;
+import com.zet.adapter.DepartAdapter;
+import com.zet.adapter.YearAdapter;
+import com.zet.asyncHandler.DepartHandler;
+import com.zet.asyncHandler.YearHandler;
+import com.zet.db.SQLiteUtils;
+import com.zet.model.DepartInfo;
+import com.zet.model.UserInfo;
+import com.zet.net.BaseNetHandler;
+import com.zet.net.HandlerFactory;
+import com.zet.net.INetProxy;
+
+/**
+ * 选择列表 Created by macchen on 15/4/3.
+ */
+@ContentView(R.layout.activity_select_department)
+public class DepartMentSelectActivity extends BaseActivity implements
+		AdapterView.OnItemClickListener {
+	@ViewInject(R.id.listview)
+	ListView lvSelectable;
+
+	/**
+	 * 选择类型(0表示选择部门、1表示选择年度)
+	 */
+	private int selectItem = 0;
+	private String workType;
+	private boolean isFromEmail;
+	private String docType;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		findViewById(R.id.iv_collect).setVisibility(View.INVISIBLE);
+		findViewById(R.id.iv_help).setVisibility(View.INVISIBLE);
+		if (savedInstanceState == null) {
+			workType = getIntent().getStringExtra("workType");
+			docType=getIntent().getStringExtra("docType");
+			selectItem = getIntent().getIntExtra("selectItem", 0);
+			isFromEmail = getIntent().getBooleanExtra("IsFromEmail", false);
+		} else {
+			workType = savedInstanceState.getString("workType");
+			docType = savedInstanceState.getString("docType");
+			selectItem = savedInstanceState.getInt("selectItem", 0);
+			isFromEmail = savedInstanceState.getBoolean("IsFromEmail", false);
+		}
+		Object object = SerializeUtils.readObject(new File(getCacheDir(),
+				"user.info"));
+		List<String> list = new ArrayList<String>();
+		if (object != null) {
+			UserInfo userInfo = (UserInfo) object;
+			if (selectItem == 0) {
+				findViewById(R.id.title_bar_img).setVisibility(View.GONE);
+				((TextView) findViewById(R.id.title_bar_text)).setText("选择部门");
+				if (isFromEmail) {
+					list = SQLiteUtils.getInstance(mContext)
+							.getEmailDepOrYearFromDb(true, workType);
+
+					List<DepartInfo> listNewDepartInfos = new ArrayList<DepartInfo>();
+					if (list.size() > 0) {
+						for (int i = 0; i < list.size(); i++) {
+							DepartInfo mDepartInfo = new DepartInfo();
+							mDepartInfo.setCode("");
+							mDepartInfo.setName(list.get(i));
+							listNewDepartInfos.add(mDepartInfo);
+						}
+					}
+					DepartInfo info = new DepartInfo();
+					info.setCode("");
+					info.setName(getString(R.string.activity_search_all_depart));
+					listNewDepartInfos.add(0, info);
+					lvSelectable.setAdapter(new DepartAdapter(
+							listNewDepartInfos));
+				} else {
+					HttpUtils
+							.get(mContext,
+									Constants.SERVER_URL,
+									ZetParams.getDepartment(
+											userInfo.getAdmdivCode(),
+											userInfo.getDivCode(),
+											userInfo.getUserId()),
+									HandlerFactory
+											.getHandler(
+													DepartHandler.class,
+													new BaseNetHandler(
+															new INetProxy(
+																	mContext,
+																	this),
+															Constants.DEPARTMENT_ACTION)));
+					LogUtils.e("---"
+							+ Constants.SERVER_URL
+							+ ZetParams
+									.getDepartment(userInfo.getAdmdivCode(),
+											userInfo.getDivCode(),
+											userInfo.getUserId()).toString());
+				}
+			} else {
+				findViewById(R.id.title_bar_img).setVisibility(View.GONE);
+				((TextView) findViewById(R.id.title_bar_text)).setText("选择年度");
+				if (isFromEmail) {
+					list = SQLiteUtils.getInstance(mContext)
+							.getEmailDepOrYearFromDb(false, workType);
+					list.add(0, getString(R.string.activity_search_all_year));
+					lvSelectable.setAdapter(new YearAdapter(list));
+				} else {
+					HttpUtils
+							.get(mContext,
+									Constants.SERVER_URL,
+									ZetParams.getYear(userInfo.getAdmdivCode(),
+											userInfo.getDivCode(),
+											userInfo.getUserId(),docType),
+									HandlerFactory
+											.getHandler(
+													YearHandler.class,
+													new BaseNetHandler(
+															new INetProxy(
+																	mContext,
+																	this),
+															Constants.GET_DOC_YEARS_ACTION)));
+				}
+			}
+		}
+
+		lvSelectable.setOnItemClickListener(this);
+
+	}
+
+	@OnClick({ R.id.tv_back })
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_back:
+			finish();
+			break;
+		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Intent intent = new Intent();
+		if (selectItem == 0) {
+			DepartInfo info = (DepartInfo) lvSelectable.getAdapter().getItem(
+					position);
+			intent.putExtra("depart_code", info.getCode());
+			intent.putExtra("depart_name", info.getName());
+		} else {
+			String name = (String) lvSelectable.getAdapter().getItem(position);
+			intent.putExtra("year", name);
+		}
+		setResult(RESULT_OK, intent);
+		finish();
+	}
+
+	@Override
+	public boolean success(String type, Object objects) {
+		Object[] data = (Object[]) objects;
+		if (type.equals(Constants.DEPARTMENT_ACTION)) {
+			List<DepartInfo> infos = (List<DepartInfo>) data[1];
+			DepartInfo info = new DepartInfo();
+			info.setCode("");
+			info.setName(getString(R.string.activity_search_all_depart));
+			infos.add(0, info);
+			lvSelectable.setAdapter(new DepartAdapter(infos));
+		} else if (type.equals(Constants.GET_DOC_YEARS_ACTION)) {
+			List<String> infos = (List<String>) data[1];
+			infos.add(0, getString(R.string.activity_search_all_year));
+			lvSelectable.setAdapter(new YearAdapter(infos));
+		}
+		return super.success(type, objects);
+	}
+}

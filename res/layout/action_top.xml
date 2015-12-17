@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/llt_top"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/c_title_s"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/tv_back"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/bg_main_back_new"
+            android:clickable="true"
+            android:textSize="@dimen/text_mediumn_small" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_main_top_right"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_search_top_padding"
+            android:paddingRight="@dimen/activity_search_top_padding" >
+
+            <ImageView
+                android:id="@+id/iv_collect"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginBottom="@dimen/activity_search_top_padding_top"
+                android:layout_marginTop="@dimen/activity_search_top_padding_top"
+                android:src="@drawable/favorite_new" />
+
+            <TextView
+                android:id="@+id/tv_refuse"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/activity_search_help_width"
+                android:layout_marginBottom="@dimen/activity_search_top_padding_top"
+                android:layout_marginLeft="@dimen/activity_search_top_padding_top"
+                android:layout_marginTop="@dimen/activity_search_top_padding_top"
+                android:text="@string/activity_search_refush"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv_help"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginBottom="@dimen/activity_search_top_padding_top"
+                android:layout_marginLeft="@dimen/activity_search_top_padding_top"
+                android:layout_marginTop="@dimen/activity_search_top_padding_top"
+                android:scaleType="fitCenter"
+                android:src="@drawable/help_new" />
+
+            <TextView
+                android:id="@+id/tv_collect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:paddingBottom="@dimen/activity_search_top_padding_top"
+                android:paddingLeft="@dimen/activity_search_top_padding"
+                android:paddingRight="@dimen/activity_search_top_padding"
+                android:paddingTop="@dimen/activity_search_top_padding_top"
+                android:text="@string/activity_detail_collect"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_mediumn_small"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/title_bar_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="@dimen/activity_search_top_padding"
+        android:src="@drawable/ic_top_icon" />
+
+    <TextView
+        android:id="@+id/title_bar_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="@dimen/activity_search_top_padding"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_large" />
+
+</RelativeLayout>
